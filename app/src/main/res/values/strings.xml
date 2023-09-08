@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Home Music Player</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="developer_token">eyJhbGciOiJFUzI1NiIsImtpZCI6IjhQRjgyNlVCVk4iLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiI0TjNTVFY3NTVXIiwiZXhwIjoxNjk0MTY3MzkwLCJpYXQiOjE2OTQxMjQxOTB9.iUYhI6sxv6zMkZpBXx_DvSR1g3khy_2FOs2-CZ-2MFxy5x6iH6IGnlritTFprKPVJUThjhoMKsVumtQ0cFmpuA</string>
+    <string name="user_token">Agq2Ol42LFVkOy7F/D22dkqV1CF08YtBJdENs0FThIf2snv0D+z/wZ3wI2AxD0vh0HkSXnvvhwONmVI50yD1t1lpYqDiRnPxjxRj9xp/NiXWH6oUNxd1jxQMzKNagbI+1+5/lev2uGm9qYh1xN4rv+c1Mty+V0eG4Nja/RQY1mnicmlToWWisWEyazrVp6LZmO1YyrLt9iqk7BAyQZGnWENzKcfH4GUzUUXtew0rIRpmbCgAsg==</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+</resources>
