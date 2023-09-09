@@ -1,6 +1,5 @@
 package com.example.homemusicplayer
 
-import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -10,12 +9,26 @@ import android.os.IBinder
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.ui.AppBarConfiguration
 import com.apple.android.sdk.authentication.AuthenticationFactory
 import com.apple.android.sdk.authentication.AuthenticationManager
+import com.example.homemusicplayer.compose.HomeMusicPlayerApp
 import com.example.homemusicplayer.databinding.ActivityMainBinding
 import com.example.homemusicplayer.service.TcpServerService
+import com.example.homemusicplayer.ui.HomeMusicPlayerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -50,7 +63,6 @@ class MainActivity : AppCompatActivity() {
                         .setContextId("1100742453")
                         .setCustomParams(params)
                         .build()
-
 
                     startActivityForResult(intent, 3456)
                 }
@@ -87,13 +99,22 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
 
-        setContentView(R.layout.activity_main)
+//        setContentView(R.layout.activity_main)
         val intent = Intent(applicationContext, TcpServerService::class.java)
         startService(intent)
+
+        // Displaying edge-to-edge
+//        WindowCompat.setDecorFitsSystemWindows(window, false)
+        setContent {
+            HomeMusicPlayerTheme {
+                HomeMusicPlayerApp()
+            }
+        }
 
         viewModel.trigger.observe(this) {
             println("Trigger is $it")
@@ -114,14 +135,6 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
-
-
-
-
-
-
-
-
     }
 
 
