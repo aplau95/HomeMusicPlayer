@@ -1,46 +1,50 @@
 package com.example.homemusicplayer.api
 
+import com.example.homemusicplayer.data.apiResponse.search.searchResponse.SearchResponse
 import com.example.homemusicplayer.data.apiResponse.search.searchSuggestionsResponse.SearchSuggestionResponse
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Headers
 import retrofit2.http.Query
+
 
 interface SearchService {
 
-    @Headers(
-        "Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjhQRjgyNlVCVk4iLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiI0TjNTVFY3NTVXIiwiZXhwIjoxNjk0MjM4NjA3LCJpYXQiOjE2OTQxOTU0MDd9.p4jFDwaUjjvTDK4AZV1b5gtm_7ByW9v-EtqXeP2izyAbCDsOvanInHkfdmBBAtS5uRMzlLlbsywtCFdNECTAUg"
-    )
-    @GET("us/search/suggestions")
+    @GET("catalog/us/search/suggestions")
     suspend fun searchTermSuggestions(
-        @Query("kinds") query: List<String>, // (Required) The suggestion kinds to include in the results. Possible Values: terms, topResults
+        @Query("kinds") query: List<String> = listOf("terms"), // (Required) The suggestion kinds to include in the results. Possible Values: terms, topResults
         @Query("l") localization: String = "en", // Locale used for search
         @Query("limit") limit: Int = 5, // Default 5 max is 10
         @Query("term") term: String, // (Required) The text input to use for search suggestions.
         @Query("types") types: List<String>? = null// Possible Values: activities, albums, apple-curators, artists, curators, music-videos, playlists, record-labels, songs, stations
-    ): SearchSuggestionResponse
+    ): Response<SearchSuggestionResponse>
 
-    companion object {
+    @GET("catalog/us/search")
+    suspend fun searchCatalogResources(
+        // The entered text for the search with ‘+’ characters between each word, to replace spaces
+        // (for example term=james+br).
+        @Query("term") term: String,
 
-        private const val BASE_URL = "https://api.music.apple.com/v1/catalog/"
+        // The localization to use, specified by a language tag. The possible values are in the
+        // supportedLanguageTags array belonging to the Storefront object specified by storefront.
+        // Otherwise, the default is defaultLanguageTag in Storefront.
+        @Query("l") localization: String = "en", // Locale used for search
 
-        fun create(): SearchService {
-            val logger =
-                HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BASIC }
+        // The number of objects or number of objects in the specified relationship returned.
+        // Default: 5
+        // Maximum Value: 25
+        @Query("limit") limit: Int = 10,
 
-            val client = OkHttpClient.Builder()
-                .addInterceptor(logger)
-                .build()
+        // The next page or group of objects to fetch.
+        @Query("offset") offset: String? = null,
 
-            return Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .client(client)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(SearchService::class.java)
-        }
-    }
+        // Required) The list of the types of resources to include in the results.
+        // Possible Values: activities, albums, apple-curators, artists, curators, music-videos,
+        // playlists, record-labels, songs, stations
+        @Query("types") types: List<String> = emptyList(),
+
+        // A list of modifications to apply to the request.
+        // Value: topResults
+        @Query("with") with: String = "topResults"
+    ): Response<SearchResponse>
+
 }

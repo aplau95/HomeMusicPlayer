@@ -9,41 +9,24 @@ import android.os.IBinder
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.core.view.WindowCompat
-import androidx.fragment.app.Fragment
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.ui.AppBarConfiguration
 import com.apple.android.sdk.authentication.AuthenticationFactory
 import com.apple.android.sdk.authentication.AuthenticationManager
 import com.example.homemusicplayer.compose.HomeMusicPlayerApp
-import com.example.homemusicplayer.databinding.ActivityMainBinding
 import com.example.homemusicplayer.service.TcpServerService
 import com.example.homemusicplayer.ui.HomeMusicPlayerTheme
+import com.example.homemusicplayer.viewModel.TokenViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var binding: ActivityMainBinding
-
-    private val viewModel by viewModels<HomeViewModel>()
+    private val viewModel by viewModels<TokenViewModel>()
 
     private lateinit var mService: TcpServerService
     private var mBound: Boolean = false
 
+    inner class Connection : ServiceConnection {
 
-    inner class Connection: ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             val binder = service as TcpServerService.TcpServerServiceBinder
             mService = binder.getService()
@@ -52,24 +35,22 @@ class MainActivity : AppCompatActivity() {
 
             mService.trigger.observe(this@MainActivity) {
                 println("Trigger is $it")
-                if(it) {
+                if (it) {
                     // Use createIntentBuilder api to create the Intentbuilder which the 3rd party app can use to customize a few things
                     val params: HashMap<String, String> = HashMap<String, String>()
                     params["ct"] = "mytestCampaignToken"
                     params["at"] = "mytestAffiliateToken"
-                    val intent = authenticationManager.createIntentBuilder(getString(R.string.developer_token))
-                        .setHideStartScreen(false)
-                        .setStartScreenMessage("Test this")
-                        .setContextId("1100742453")
-                        .setCustomParams(params)
-                        .build()
+                    val intent =
+                        authenticationManager.createIntentBuilder(viewModel.token.value)
+                            .setHideStartScreen(false)
+                            .setStartScreenMessage("Test this")
+                            .setContextId("1100742453")
+                            .setCustomParams(params)
+                            .build()
 
                     startActivityForResult(intent, 3456)
                 }
-
             }
-
-
         }
 
         override fun onServiceDisconnected(p0: ComponentName?) {
@@ -82,7 +63,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
-        Intent(applicationContext, TcpServerService::class.java).also {intent ->
+        Intent(applicationContext, TcpServerService::class.java).also { intent ->
             bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
 
@@ -95,75 +76,28 @@ class MainActivity : AppCompatActivity() {
         mBound = false
     }
 
-    private val authenticationManager: AuthenticationManager = AuthenticationFactory.createAuthenticationManager(this)
+    private val authenticationManager: AuthenticationManager =
+        AuthenticationFactory.createAuthenticationManager(this)
 
-
-
+    private fun startTCPServer() {
+        val intent = Intent(applicationContext, TcpServerService::class.java)
+        startService(intent)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
-//        setContentView(R.layout.activity_main)
-        val intent = Intent(applicationContext, TcpServerService::class.java)
-        startService(intent)
-
-        // Displaying edge-to-edge
-//        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             HomeMusicPlayerTheme {
                 HomeMusicPlayerApp()
             }
         }
 
-        viewModel.trigger.observe(this) {
-            println("Trigger is $it")
-            if(it) {
-                // Use createIntentBuilder api to create the Intentbuilder which the 3rd party app can use to customize a few things
-                val params: HashMap<String, String> = HashMap<String, String>()
-                params["ct"] = "mytestCampaignToken"
-                params["at"] = "mytestAffiliateToken"
-                val intent = authenticationManager.createIntentBuilder(getString(R.string.developer_token))
-                    .setHideStartScreen(false)
-                    .setStartScreenMessage("Test this")
-                    .setContextId("1100742453")
-                    .setCustomParams(params)
-                    .build()
-
-
-                startActivityForResult(intent, 3456)
-            }
-
-        }
     }
-
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        println("REQUEST CODE $requestCode")
-        println("result from this ${authenticationManager.handleTokenResult(data).musicUserToken}")
+        viewModel.saveToken(authenticationManager.handleTokenResult(data).musicUserToken)
     }
 
-
-    private fun replaceMainFragment(fragment: Fragment, tag: String, addToBackStack: Boolean) {
-//        val fragmentTransaction = fragmentManager.beginTransaction()
-//        fragmentTransaction.replace(R.id.main_container, fragment, tag)
-//        if (addToBackStack) {
-//            fragmentTransaction.addToBackStack(null)
-//        }
-//        fragmentTransaction.commit()
-    }
-
-
-
-//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        menuInflater.inflate(R.menu.main, menu)
-//        return true
-//    }
-//
-//    override fun onSupportNavigateUp(): Boolean {
-//        val navController = findNavController(R.id.nav_host_fragment_content_main)
-//        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-//    }
 }

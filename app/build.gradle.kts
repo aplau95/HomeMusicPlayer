@@ -5,6 +5,18 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
+val privateKey: String = com.android.build.gradle.internal.cxx.configure.gradleLocalProperties(
+    rootDir
+).getProperty("privateKey")
+
+val teamId: String = com.android.build.gradle.internal.cxx.configure.gradleLocalProperties(
+    rootDir
+).getProperty("teamId")
+
+val keyId: String = com.android.build.gradle.internal.cxx.configure.gradleLocalProperties(
+    rootDir
+).getProperty("keyId")
+
 android {
     namespace = "com.example.homemusicplayer"
     compileSdk = 34
@@ -28,7 +40,13 @@ android {
                 "proguard-rules.pro"
             )
         }
+        debug {
+            buildConfigField("String", "privateKey", privateKey)
+            buildConfigField("String", "teamId", teamId)
+            buildConfigField("String", "keyId", keyId)
+        }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -37,6 +55,7 @@ android {
         jvmTarget = "17"
     }
     buildFeatures {
+        buildConfig = true
         viewBinding = true
         dataBinding = true
         compose = true
@@ -69,6 +88,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     debugImplementation("androidx.compose.ui:ui-tooling")
 
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
     // UI Tests
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
@@ -78,6 +99,7 @@ dependencies {
     val paging_version = "3.2.1"
 
     implementation("androidx.paging:paging-runtime:$paging_version")
+    implementation("com.google.code.gson:gson:2.10.1")
 
     // alternatively - without Android dependencies for tests
     testImplementation("androidx.paging:paging-common:$paging_version")
@@ -109,6 +131,7 @@ dependencies {
 
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
 
+    implementation("androidx.core:core-splashscreen:1.0.0")
 
     // Optional - Included automatically by material, only add when you need
     // the icons but not the material library (e.g. when using Material3 or a
@@ -129,6 +152,8 @@ dependencies {
     // Optional - Integration with RxJava
     implementation("androidx.compose.runtime:runtime-rxjava2")
 
+    implementation("org.bouncycastle:bcprov-jdk15on:1.64")
+
 
     // Java language implementation
     implementation("androidx.navigation:navigation-fragment:$nav_version")
@@ -143,6 +168,7 @@ dependencies {
     implementation("androidx.navigation:navigation-dynamic-features-fragment:$nav_version")
 
 
+    implementation("io.coil-kt:coil-compose:2.4.0")
     // Testing Navigation
     androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")
     implementation("com.google.dagger:hilt-android:2.44")
@@ -160,6 +186,9 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+    implementation("io.github.nefilim.kjwt:kjwt-core:0.9.0")
+    implementation("androidx.media:media:1.6.0")
+    
 }
 
 kapt {

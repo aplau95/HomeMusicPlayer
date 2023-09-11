@@ -6,7 +6,7 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
-    <string name="developer_token">eyJhbGciOiJFUzI1NiIsImtpZCI6IjhQRjgyNlVCVk4iLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiI0TjNTVFY3NTVXIiwiZXhwIjoxNjk0MjM4NjA3LCJpYXQiOjE2OTQxOTU0MDd9.p4jFDwaUjjvTDK4AZV1b5gtm_7ByW9v-EtqXeP2izyAbCDsOvanInHkfdmBBAtS5uRMzlLlbsywtCFdNECTAUg</string>
+    <string name="developer_token">eyJhbGciOiJFUzI1NiIsImtpZCI6IjhQRjgyNlVCVk4iLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiI0TjNTVFY3NTVXIiwiZXhwIjoxNjk0Mzk3NzkyLCJpYXQiOjE2OTQzNTQ1OTJ9.4auHMKzyzgwiFpz3EfvmhebPH_0p90G1MamBBm9NJu89nWrocVRjLXxCClK6B9PzUJ8glH8Sakn3l5r-YEZ0qw</string>
     <string name="user_token">Agq2Ol42LFVkOy7F/D22dkqV1CF08YtBJdENs0FThIf2snv0D+z/wZ3wI2AxD0vh0HkSXnvvhwONmVI50yD1t1lpYqDiRnPxjxRj9xp/NiXWH6oUNxd1jxQMzKNagbI+1+5/lev2uGm9qYh1xN4rv+c1Mty+V0eG4Nja/RQY1mnicmlToWWisWEyazrVp6LZmO1YyrLt9iqk7BAyQZGnWENzKcfH4GUzUUXtew0rIRpmbCgAsg==</string>
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>

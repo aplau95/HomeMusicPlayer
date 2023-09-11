@@ -1,10 +1,12 @@
 package com.example.homemusicplayer.viewModel
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.homemusicplayer.api.SearchService
-import com.example.homemusicplayer.data.apiResponse.search.searchSuggestionsResponse.suggestion.Suggestion
+import com.example.homemusicplayer.data.SearchRepository
+import com.example.homemusicplayer.data.apiResponse.ApiResponse
+import com.example.homemusicplayer.data.apiResponse.search.searchResponse.SearchResponse
+import com.example.homemusicplayer.data.apiResponse.search.searchSuggestionsResponse.SearchSuggestionResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,23 +17,41 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    val service: SearchService
-) : ViewModel() {
+    val service: SearchService,
+    val repository: SearchRepository
+) : BaseViewModel() {
 
-    private var queryString: String? = savedStateHandle["plantName"]
 
-    var _terms = MutableStateFlow<Suggestion?>(null)
-    val terms: StateFlow<Suggestion?> = _terms
+    var _terms = MutableStateFlow<ApiResponse<SearchSuggestionResponse>?>(null)
+    val terms: StateFlow<ApiResponse<SearchSuggestionResponse>?> = _terms
+
+    var _catalog = MutableStateFlow<ApiResponse<SearchResponse>?>(null)
+    val catalog: StateFlow<ApiResponse<SearchResponse>?> = _catalog
 
     var _searchTerm = MutableStateFlow("")
     val searchTerm = _searchTerm
+
+    fun getCatalogResources(query: String) = baseRequest(
+        _catalog,
+        coroutinesErrorHandler
+    ) {
+        repository.getCatalogResources(term = query)
+    }
+
+    fun getSearchSuggestions(query: String) = baseRequest(
+        _terms,
+        coroutinesErrorHandler
+    ) {
+        repository.getSearchTermResources(query)
+    }
 
     init {
         viewModelScope.launch {
             searchTerm.debounce(1000).collect { query ->
                 if (query.isNotEmpty()) {
-                    _terms.value =
-                        service.searchTermSuggestions(listOf("terms"), term = query).results
+                    catalog.value
+                    getCatalogResources(query)
+                    getSearchSuggestions(query)
                 }
             }
         }

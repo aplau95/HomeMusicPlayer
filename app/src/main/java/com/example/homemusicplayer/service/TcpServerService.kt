@@ -11,8 +11,6 @@ import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.fragment.app.activityViewModels
-import com.example.homemusicplayer.HomeViewModel
 import com.example.homemusicplayer.R
 import dagger.hilt.android.AndroidEntryPoint
 import utils.SingleLiveEvent
@@ -22,7 +20,6 @@ import java.io.IOException
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.random.Random
 
 @AndroidEntryPoint
 class TcpServerService : Service() {
@@ -34,7 +31,8 @@ class TcpServerService : Service() {
     val randomNumber: Int
         get() = mGenerator.nextInt(100)
 
-    inner class TcpServerServiceBinder: Binder() {
+    inner class TcpServerServiceBinder : Binder() {
+
         fun getService(): TcpServerService = this@TcpServerService
     }
 
@@ -42,7 +40,7 @@ class TcpServerService : Service() {
         return binder
     }
 
-    private var _trigger = SingleLiveEvent<Boolean>().apply{ value = false}
+    private var _trigger = SingleLiveEvent<Boolean>().apply { value = false }
     val trigger = _trigger
     private var serverSocket: ServerSocket? = null
     private val working = AtomicBoolean(true)
@@ -58,7 +56,8 @@ class TcpServerService : Service() {
                     val dataOutputStream = DataOutputStream(socket.getOutputStream())
 
                     // Use threads for each client to communicate with them simultaneously
-                    val t: Thread = TcpClientHandler(dataInputStream, dataOutputStream, ::receiveCallback)
+                    val t: Thread =
+                        TcpClientHandler(dataInputStream, dataOutputStream, ::receiveCallback)
                     t.start()
                 } else {
                     Log.e(TAG, "Couldn't create ServerSocket!")
@@ -92,7 +91,11 @@ class TcpServerService : Service() {
     private fun startMeForeground() {
         val NOTIFICATION_CHANNEL_ID = packageName
         val channelName = "Tcp Server Background Service"
-        val chan = NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE)
+        val chan = NotificationChannel(
+            NOTIFICATION_CHANNEL_ID,
+            channelName,
+            NotificationManager.IMPORTANCE_NONE
+        )
         chan.lightColor = Color.BLUE
         chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
         val manager = (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
@@ -108,6 +111,7 @@ class TcpServerService : Service() {
     }
 
     companion object {
+
         private val TAG = TcpServerService::class.java.simpleName
         private const val PORT = 9876
     }
