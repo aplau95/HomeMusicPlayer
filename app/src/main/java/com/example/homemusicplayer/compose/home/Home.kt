@@ -167,11 +167,7 @@ private fun HomeNavBar(
                     }
                 }
             }
-
-
         }
-
-
     }
 
 }
