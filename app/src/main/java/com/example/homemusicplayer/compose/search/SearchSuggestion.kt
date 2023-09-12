@@ -1,6 +1,7 @@
 package com.example.homemusicplayer.compose.search
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -17,11 +18,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SearchSuggestionRow(term: String) {
+fun SearchSuggestionRow(
+    term: String,
+    searchTerm: String,
+    onSearch: (String) -> Unit,
+) {
 
     val color = androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
     Row(
@@ -39,13 +47,33 @@ fun SearchSuggestionRow(term: String) {
                     strokeWidth
                 )
             }
-        ,
+            .clickable {
+                onSearch(term)
+            },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
         Icon(Icons.Rounded.Search, contentDescription = "Search")
         Text(
-            text = term,
+            text = buildAnnotatedString {
+                withStyle(
+                    style = SpanStyle(
+                        color = Color.Gray
+                    )
+                ) {
+                    append(term.substringBefore(searchTerm))
+                }
+
+                append(searchTerm)
+
+                withStyle(
+                    style = SpanStyle(
+                        color = Color.Gray
+                    )
+                ) {
+                    append(term.substringAfter(searchTerm))
+                }
+            },
             modifier = Modifier.padding(start = 4.dp)
         )
 
@@ -55,8 +83,9 @@ fun SearchSuggestionRow(term: String) {
 @Preview
 @Composable
 fun PreviewSearchSuggestion() {
+
     Box(modifier = Modifier.background(Color.White)) {
-        SearchSuggestionRow(term = "Test")
+        SearchSuggestionRow(term = "Test", "Te", {})
     }
 
 }

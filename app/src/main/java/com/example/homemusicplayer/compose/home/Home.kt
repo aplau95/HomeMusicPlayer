@@ -1,6 +1,5 @@
 package com.example.homemusicplayer.compose.home
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
@@ -18,6 +18,9 @@ import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LibraryMusic
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,7 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.homemusicplayer.R
@@ -39,11 +42,11 @@ import kotlinx.coroutines.launch
 
 enum class HomePage(
     @StringRes val titleResId: Int,
-    @DrawableRes val drawableResId: Int
+    val icon: ImageVector
 ) {
 
-    LIBRARY(R.string.library, R.drawable.ic_menu_camera),
-    SEARCH(R.string.search, R.drawable.ic_menu_gallery),
+    LIBRARY(R.string.library, Icons.Filled.LibraryMusic),
+    SEARCH(R.string.search, Icons.Filled.Search),
 
 }
 
@@ -60,7 +63,7 @@ fun Home(
     }
 
     Scaffold(bottomBar = { TabBar(pagerState = pagerState) }) {
-        HomeNavBar(pagerState = pagerState, modifier.padding(it))
+        HomeNavBar(pagerState = pagerState, modifier.padding(top = it.calculateTopPadding()))
     }
 }
 
@@ -75,6 +78,7 @@ private fun TabBar(
     val coroutineScope = rememberCoroutineScope()
 
     TabRow(
+        modifier = Modifier.height(50.dp),
         selectedTabIndex = pagerState.currentPage
     ) {
         pages.forEachIndexed { index, page ->
@@ -85,7 +89,7 @@ private fun TabBar(
                 text = { Text(text = title) },
                 icon = {
                     Icon(
-                        painter = painterResource(id = page.drawableResId),
+                        page.icon,
                         contentDescription = title
                     )
                 },
@@ -104,9 +108,6 @@ private fun HomeNavBar(
 
 
     Column(modifier) {
-        val coroutineScope = rememberCoroutineScope()
-
-
         HorizontalPager(
 
             state = pagerState,

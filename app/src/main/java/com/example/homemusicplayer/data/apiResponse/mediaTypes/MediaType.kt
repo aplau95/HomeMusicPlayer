@@ -1,4 +1,6 @@
-package com.example.homemusicplayer.data.apiResponse.types
+package com.example.homemusicplayer.data.apiResponse.mediaTypes
+
+import com.example.homemusicplayer.data.apiResponse.mediaTypes.attributes.TypeAttributes
 
 open class MediaType<T : TypeAttributes>(
     val type: String? = null,

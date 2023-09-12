@@ -1,5 +1,10 @@
-package com.example.homemusicplayer.data.apiResponse.types
+package com.example.homemusicplayer.data.apiResponse.mediaTypes.deserializer
 
+import com.example.homemusicplayer.data.apiResponse.mediaTypes.Album
+import com.example.homemusicplayer.data.apiResponse.mediaTypes.Artist
+import com.example.homemusicplayer.data.apiResponse.mediaTypes.MediaType
+import com.example.homemusicplayer.data.apiResponse.mediaTypes.Song
+import com.example.homemusicplayer.data.apiResponse.mediaTypes.attributes.TypeAttributes
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement

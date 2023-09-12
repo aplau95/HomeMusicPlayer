@@ -92,20 +92,7 @@ fun SearchBar(
                 contentPadding = PaddingValues(0.dp)
             )
         }
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(40.dp)
-//                    .background(
-//                        color = MaterialTheme.colorScheme.primaryContainer,
-//                        shape = RoundedCornerShape(8.dp)
-//                    ),
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//
-//                it()
-//
-//            }
+
         Text(
             text = "Cancel",
             modifier = Modifier.padding(12.dp),

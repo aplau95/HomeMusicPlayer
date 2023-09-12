@@ -7,11 +7,11 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.example.homemusicplayer.api.SearchService
 import com.example.homemusicplayer.authManager.AuthAuthenticator
 import com.example.homemusicplayer.authManager.AuthInterceptor
-import com.example.homemusicplayer.data.apiResponse.types.Album
-import com.example.homemusicplayer.data.apiResponse.types.Artist
-import com.example.homemusicplayer.data.apiResponse.types.MediaType
-import com.example.homemusicplayer.data.apiResponse.types.Song
-import com.example.homemusicplayer.data.apiResponse.types.TypeResourceDeserializer
+import com.example.homemusicplayer.data.apiResponse.mediaTypes.Album
+import com.example.homemusicplayer.data.apiResponse.mediaTypes.Artist
+import com.example.homemusicplayer.data.apiResponse.mediaTypes.MediaType
+import com.example.homemusicplayer.data.apiResponse.mediaTypes.Song
+import com.example.homemusicplayer.data.apiResponse.mediaTypes.deserializer.TypeResourceDeserializer
 import com.example.homemusicplayer.persist.TokenManager
 import com.google.gson.GsonBuilder
 import dagger.Module
