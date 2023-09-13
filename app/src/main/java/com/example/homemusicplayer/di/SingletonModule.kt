@@ -10,6 +10,7 @@ import com.example.homemusicplayer.authManager.AuthInterceptor
 import com.example.homemusicplayer.data.apiResponse.mediaTypes.Album
 import com.example.homemusicplayer.data.apiResponse.mediaTypes.Artist
 import com.example.homemusicplayer.data.apiResponse.mediaTypes.MediaType
+import com.example.homemusicplayer.data.apiResponse.mediaTypes.Playlist
 import com.example.homemusicplayer.data.apiResponse.mediaTypes.Song
 import com.example.homemusicplayer.data.apiResponse.mediaTypes.deserializer.TypeResourceDeserializer
 import com.example.homemusicplayer.persist.TokenManager
@@ -104,6 +105,6 @@ class SingletonModule {
             .registerSubtype(Artist::class.java, "artists")
             .registerSubtype(Song::class.java, "songs")
             .registerSubtype(Album::class.java, "albums")
-
+            .registerSubtype(Playlist::class.java, "playlists")
 }
 

@@ -1,57 +1,118 @@
 package com.example.homemusicplayer.viewModel
 
+import android.os.Bundle
+import android.os.ResultReceiver
+import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.apple.android.music.sdk.testapp.service.MediaSessionManager
 import com.example.homemusicplayer.data.SearchRepository
 import com.example.homemusicplayer.data.apiResponse.ApiResponse
+import com.example.homemusicplayer.data.apiResponse.mediaTypes.Song
 import com.example.homemusicplayer.data.apiResponse.search.searchResponse.SearchResponse
 import com.example.homemusicplayer.data.apiResponse.search.searchSuggestionsResponse.SearchSuggestionResponse
+import com.example.homemusicplayer.media.MediaPlayerServiceConnection
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    val repository: SearchRepository
+    private val savedStateHandle: SavedStateHandle,
+    val repository: SearchRepository,
+    val serviceConnection: MediaPlayerServiceConnection
 ) : BaseViewModel() {
 
 
     var _terms = MutableStateFlow<ApiResponse<SearchSuggestionResponse>>(ApiResponse.Loading)
-    val terms: StateFlow<ApiResponse<SearchSuggestionResponse>> = _terms
+    val terms = _terms.asStateFlow()
+
 
     var _catalog = MutableStateFlow<ApiResponse<SearchResponse>>(ApiResponse.Loading)
-    val catalog: StateFlow<ApiResponse<SearchResponse>> = _catalog
+    val catalog = _catalog.asStateFlow()
 
     var _searchTerm = MutableStateFlow("")
-    val searchTerm = _searchTerm
+    val searchTerm = _searchTerm.asStateFlow()
 
-    fun getCatalogResources(query: String) = baseRequest(
-        _catalog,
-        coroutinesErrorHandler
-    ) {
-        repository.getCatalogResources(term = query)
+    data class SearchPageState(
+        val searchCatalog: SearchResponse,
+        val termSuggestions: SearchSuggestionResponse
+    )
+
+    var _searchPageState = MutableStateFlow<ApiResponse<SearchPageState>>(ApiResponse.Loading)
+    val searchPageState = _searchPageState.asStateFlow()
+
+    fun playMedia(song: Song) {
+        Log.e("SearchViewModel", "id is ${song.id}")
+        val songMetadata = song.toMediaMetadataCompat()
+        serviceConnection.mediaControllerCompat.let { mc ->
+            mc.sendCommand(
+                MediaSessionManager.COMMAND_SWAP_QUEUE,
+                null,
+                object : ResultReceiver(null) {
+                    override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
+                        if (resultCode == MediaSessionManager.RESULT_ADD_QUEUE_ITEMS) {
+//                        for (mediaItem in songs) {
+
+                            mc.addQueueItem(songMetadata.description)
+//                        }
+
+                            mc.transportControls?.prepare()
+
+                            serviceConnection.transportControl.playFromMediaId(
+                                songMetadata.description.mediaId,
+                                null
+                            )
+                        }
+
+
+                    }
+                })
+        }
+
+
     }
 
-    fun getSearchSuggestions(query: String) = baseRequest(
-        _terms,
+    fun getSearchResults(term: String) = baseRequest(
+        _searchPageState,
         coroutinesErrorHandler
     ) {
-        repository.getSearchTermResources(query)
+        val termUpdated = term.replace("\\s".toRegex(), "+")
+        repository.getCatalogResources(termUpdated)
+            .combine(repository.getSearchTermResources(termUpdated)) { catalog, terms ->
+                return@combine when {
+                    catalog is ApiResponse.Success && terms is ApiResponse.Success ->
+                        ApiResponse.Success(
+                            data = SearchPageState(
+                                searchCatalog = catalog.data,
+                                termSuggestions = terms.data
+                            )
+                        )
+
+                    catalog is ApiResponse.Loading -> ApiResponse.Loading
+                    catalog is ApiResponse.Failure -> ApiResponse.Failure<SearchPageState>(
+                        errorMessage = catalog.errorMessage,
+                        code = catalog.code
+                    )
+
+                    else -> throw Exception("No")
+                }
+            }
     }
 
     fun updateSearchTerms(text: String) {
         _searchTerm.value = text
+        serviceConnection.searchQuery(text)
     }
+
 
     init {
         viewModelScope.launch {
-            searchTerm.debounce(1000).collect { query ->
-                if (query.isNotEmpty()) {
-                    getCatalogResources(query)
-                    getSearchSuggestions(query)
-                }
+            searchTerm.collect { query ->
+                getSearchResults(query)
             }
         }
 

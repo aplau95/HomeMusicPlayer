@@ -8,9 +8,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
 
 open class BaseViewModel : ViewModel() {
 
@@ -26,7 +26,7 @@ open class BaseViewModel : ViewModel() {
                 errorHandler.onError(error.localizedMessage ?: "Error please try again")
             }
         }) {
-            request().collect {
+            request().debounce(1000).collect {
                 withContext(Dispatchers.Main) {
                     stateFlow.value = it
                 }

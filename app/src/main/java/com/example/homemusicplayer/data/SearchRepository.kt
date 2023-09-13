@@ -2,12 +2,13 @@ package com.example.homemusicplayer.data
 
 import com.example.homemusicplayer.api.ApiRequestFlow
 import com.example.homemusicplayer.api.SearchService
-import dagger.hilt.android.scopes.ViewModelScoped
+import com.example.homemusicplayer.viewModel.BaseViewModel
 import javax.inject.Inject
 
 
-@ViewModelScoped
-class SearchRepository @Inject constructor(private val service: SearchService) {
+class SearchRepository @Inject constructor(
+    private val service: SearchService,
+) : BaseViewModel() {
 
     fun getCatalogResources(term: String) = ApiRequestFlow.apiRequestFlow {
         service.searchCatalogResources(term = term)
@@ -16,6 +17,12 @@ class SearchRepository @Inject constructor(private val service: SearchService) {
     fun getSearchTermResources(term: String) = ApiRequestFlow.apiRequestFlow {
         service.searchTermSuggestions(term = term)
     }
+
+//    fun getSearchResults(term: String) =
+//        getCatalogResources(term).combine(getSearchTermResources(term)) { catalog, search ->
+//
+//
+//        }.stateIn()
 
 
 }

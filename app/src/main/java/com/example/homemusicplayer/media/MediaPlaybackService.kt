@@ -1,12 +1,12 @@
-//package com.example.homemusicplayer.api
+//package com.example.homemusicplayer.media
 //
 //import android.content.Intent
-//import android.media.session.MediaSessionManager
 //import android.os.Bundle
 //import android.os.Handler
 //import android.os.HandlerThread
 //import android.os.Message
 //import android.os.Process
+//import android.support.v4.media.MediaBrowserCompat
 //import android.support.v4.media.session.MediaSessionCompat
 //import android.util.Log
 //import android.view.KeyEvent
@@ -19,44 +19,54 @@
 //import com.apple.android.music.playback.model.PlaybackShuffleMode
 //import com.apple.android.music.playback.model.PlaybackState
 //import com.apple.android.music.playback.model.PlayerQueueItem
+//import com.example.homemusicplayer.api.AppleMusicTokenProvider
+//import com.example.homemusicplayer.api.LocalMediaProvider
+//import com.example.homemusicplayer.api.PlaybackNotificationManager
+//import dagger.hilt.android.AndroidEntryPoint
 //
-//
-///**
-// * Copyright (C) 2017 Apple, Inc. All rights reserved.
-// */
-//class MediaPlaybackService : MediaBrowserServiceCompat(), MediaPlayerController.Listener,
+//@AndroidEntryPoint
+//class MediaPlaybackService :
+//    MediaBrowserServiceCompat(),
+//    MediaPlayerController.Listener,
 //    Handler.Callback {
 //
-//    private var serviceHandlerThread: HandlerThread? = null
-//    private var serviceHandler: Handler? = null
-//    private var playerController: MediaPlayerController? = null
-//    private var mediaSession: MediaSessionCompat? = null
-//    private var playbackNotificationManager: PlaybackNotificationManager? = null
-//    private var mediaProvider: LocalMediaProvider? = null
+//
+//    private val serviceHandlerThread: HandlerThread =
+//        HandlerThread("MediaPlaybackService:Handler", Process.THREAD_PRIORITY_BACKGROUND)
+//    private lateinit var serviceHandler: Handler
+//    private lateinit var playerController: MediaPlayerController
+//
+//    private lateinit var mediaSession: MediaSessionCompat
+//    private lateinit var playbackNotificationManager: PlaybackNotificationManager
+//    private lateinit var mediaProvider: LocalMediaProvider
+//
 //
 //    override fun onCreate() {
 //        super.onCreate()
-//        serviceHandlerThread =
-//            HandlerThread("MediaPlaybackService:Handler", Process.THREAD_PRIORITY_BACKGROUND)
-//        serviceHandlerThread!!.start()
-//        serviceHandler = Handler(serviceHandlerThread!!.looper, this)
+//        Log.e("MediaPlaybackService", "onCreate")
+////        serviceHandlerThread =
+////            HandlerThread("MediaPlaybackService:Handler", Process.THREAD_PRIORITY_BACKGROUND)
+//        serviceHandlerThread.start()
+//        serviceHandler = Handler(serviceHandlerThread.looper, this)
 //        playbackNotificationManager = PlaybackNotificationManager(this, serviceHandler)
 //        playerController = MediaPlayerControllerFactory.createLocalController(
 //            this,
-//            serviceHandler!!, AppleMusicTokenProvider(this)
+//            serviceHandler, AppleMusicTokenProvider(this)
 //        )
-//        playerController!!.addListener(this)
+//        playerController.addListener(this)
 //        mediaSession = MediaSessionCompat(this, TAG)
-//        mediaSession!!.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS or MediaSessionCompat.FLAG_HANDLES_QUEUE_COMMANDS)
-//        mediaSession!!.setCallback(
-//            MediaSessionManager(
-//                this,
-//                serviceHandler,
-//                playerController,
-//                mediaSession
-//            ), serviceHandler
-//        )
-//        setSessionToken(mediaSession.getSessionToken())
+//        mediaSession.apply {
+//            setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS or MediaSessionCompat.FLAG_HANDLES_QUEUE_COMMANDS)
+//            setCallback(
+//                MediaSessionManager(
+//                    this@MediaPlaybackService,
+//                    serviceHandler,
+//                    playerController,
+//                    this@MediaPlaybackService.mediaSession
+//                ), serviceHandler
+//            )
+//        }
+//        sessionToken = mediaSession.sessionToken
 //        mediaProvider = LocalMediaProvider(this)
 //    }
 //
@@ -64,21 +74,28 @@
 //        super.onDestroy()
 //        playbackNotificationManager.stop(true)
 //        mediaSession.release()
-//        playerController!!.release()
-//        serviceHandlerThread!!.quit()
+//        playerController.release()
+//        serviceHandlerThread.quit()
 //    }
 //
-//    fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-//        serviceHandler!!.obtainMessage(MESSAGE_START_COMMAND, intent).sendToTarget()
+//    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+//        serviceHandler.obtainMessage(MESSAGE_START_COMMAND, intent).sendToTarget()
 //        return START_STICKY
 //    }
 //
-//    fun onGetRoot(clientPackageName: String, clientUid: Int, rootHints: Bundle?): BrowserRoot {
+//    override fun onGetRoot(
+//        clientPackageName: String,
+//        clientUid: Int,
+//        rootHints: Bundle?
+//    ): BrowserRoot {
 //        // TODO: This needs to make sure the client is allowed to browse
 //        return BrowserRoot(LocalMediaProvider.MEDIA_ROOT_ID, null)
 //    }
 //
-//    fun onLoadChildren(parentId: String, result: Result<List<MediaItem?>?>) {
+//    override fun onLoadChildren(
+//        parentId: String,
+//        result: Result<List<MediaBrowserCompat.MediaItem>>
+//    ) {
 //        mediaProvider.loadMediaItems(parentId, result)
 //    }
 //
@@ -174,8 +191,8 @@
 //    ) {
 //    }
 //
-//    fun onTaskRemoved(rootIntent: Intent?) {
-//        serviceHandler!!.sendEmptyMessage(MESSAGE_TASK_REMOVED)
+//    override fun onTaskRemoved(rootIntent: Intent?) {
+//        serviceHandler.sendEmptyMessage(MESSAGE_TASK_REMOVED)
 //    }
 //
 //    private fun handleIntent(intent: Intent) {}
@@ -183,8 +200,8 @@
 //    companion object {
 //
 //        private const val TAG = "MediaPlaybackService"
-//        private const val MESSAGE_START_COMMAND = 1
-//        private const val MESSAGE_TASK_REMOVED = 2
+//        const val MESSAGE_START_COMMAND = 1
+//        const val MESSAGE_TASK_REMOVED = 2
 //
 //        init {
 //            try {

@@ -1,6 +1,5 @@
 package com.example.homemusicplayer.api
 
-import android.util.Log
 import com.example.homemusicplayer.data.apiResponse.ApiResponse
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -21,11 +20,8 @@ class ApiRequestFlow {
                 withTimeoutOrNull(20000L) {
                     val response = call()
 
-                    Log.e("YOOOO", response.message())
-
                     try {
                         if (response.isSuccessful) {
-                            Log.e("YOOOO", response.message())
                             response.body()?.let { data ->
                                 emit(ApiResponse.Success(data))
                             }

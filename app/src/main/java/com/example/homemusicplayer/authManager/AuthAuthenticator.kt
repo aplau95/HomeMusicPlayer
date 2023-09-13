@@ -33,10 +33,10 @@ class AuthAuthenticator @Inject constructor(
             val privateKey = getPrivateKey()
 
             jwtResult.sign(privateKey).fold(
-                ifLeft = { tokenManager.deleteToken() },
+                ifLeft = { tokenManager.deleteJWTToken() },
                 ifRight = {
                     newToken = it.rendered
-                    tokenManager.saveToken(newToken)
+                    tokenManager.saveJWTToken(newToken)
                     Log.e("TOKEN", it.rendered)
                 }
             )
@@ -54,7 +54,7 @@ class AuthAuthenticator @Inject constructor(
         val text = BuildConfig.privateKey
 
         val bytes = Base64.getDecoder().decode(text)
-        
+
         val spec = PKCS8EncodedKeySpec(bytes)
         val factory = KeyFactory.getInstance("EC", BC)
 

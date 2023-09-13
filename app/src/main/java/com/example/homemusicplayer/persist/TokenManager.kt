@@ -10,24 +10,43 @@ import kotlinx.coroutines.flow.map
 class TokenManager(private val context: Context) {
     companion object {
 
-        private val TOKEN_KEY = stringPreferencesKey("jwt_token")
+        val JWT_TOKEN_KEY = stringPreferencesKey("jwt_token")
+        val USER_TOKEN_KEY = stringPreferencesKey("user_token")
     }
 
-    fun getToken(): Flow<String?> {
+    fun getJWTToken(): Flow<String?> {
         return context.dataStore.data.map { preferences ->
-            preferences[TOKEN_KEY]
+            preferences[JWT_TOKEN_KEY]
         }
     }
 
-    suspend fun saveToken(token: String) {
+    suspend fun saveJWTToken(token: String) {
         context.dataStore.edit { preferences ->
-            preferences[TOKEN_KEY] = token
+            preferences[JWT_TOKEN_KEY] = token
         }
     }
 
-    suspend fun deleteToken() {
+    suspend fun deleteJWTToken() {
         context.dataStore.edit { preferences ->
-            preferences.remove(TOKEN_KEY)
+            preferences.remove(JWT_TOKEN_KEY)
+        }
+    }
+
+    fun getUserToken(): Flow<String?> {
+        return context.dataStore.data.map { preferences ->
+            preferences[JWT_TOKEN_KEY]
+        }
+    }
+
+    suspend fun saveUserToken(token: String) {
+        context.dataStore.edit { preferences ->
+            preferences[JWT_TOKEN_KEY] = token
+        }
+    }
+
+    suspend fun deleteUserToken() {
+        context.dataStore.edit { preferences ->
+            preferences.remove(JWT_TOKEN_KEY)
         }
     }
 }

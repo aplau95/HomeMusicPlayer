@@ -11,18 +11,27 @@ interface SearchService {
 
     @GET("catalog/us/search/suggestions")
     suspend fun searchTermSuggestions(
-        @Query("kinds") query: List<String> = listOf("terms"), // (Required) The suggestion kinds to include in the results. Possible Values: terms, topResults
-        @Query("l") localization: String = "en", // Locale used for search
-        @Query("limit") limit: Int = 5, // Default 5 max is 10
-        @Query("term") term: String, // (Required) The text input to use for search suggestions.
-        @Query("types") types: List<String>? = null// Possible Values: activities, albums, apple-curators, artists, curators, music-videos, playlists, record-labels, songs, stations
+        // (Required) The suggestion kinds to include in the results. Possible Values: terms, topResults
+        @Query("kinds") query: List<String> = listOf("terms"),
+
+        // Locale used for search
+        @Query("l") localization: String = "en",
+
+        // Default 5 max is 10
+        @Query("limit") limit: Int = 5,
+
+        // (Required) The text input to use for search suggestions.
+        @Query("term", encoded = true) term: String,
+
+        // Possible Values: activities, albums, apple-curators, artists, curators, music-videos, playlists, record-labels, songs, stations
+        @Query("types") types: List<String>? = null
     ): Response<SearchSuggestionResponse>
 
     @GET("catalog/us/search")
     suspend fun searchCatalogResources(
         // The entered text for the search with ‘+’ characters between each word, to replace spaces
         // (for example term=james+br).
-        @Query("term") term: String,
+        @Query("term", encoded = true) term: String,
 
         // The localization to use, specified by a language tag. The possible values are in the
         // supportedLanguageTags array belonging to the Storefront object specified by storefront.

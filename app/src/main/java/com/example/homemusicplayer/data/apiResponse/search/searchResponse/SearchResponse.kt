@@ -4,7 +4,7 @@ import com.example.homemusicplayer.data.apiResponse.mediaTypes.MediaType
 import com.google.gson.annotations.SerializedName
 
 data class SearchResponse(
-    @field:SerializedName("results") val results: Results,
+    @field:SerializedName("results") val results: Results?,
 )
 
 data class Results(

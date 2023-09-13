@@ -1,6 +1,5 @@
 package com.example.homemusicplayer.viewModel
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,28 +15,41 @@ class TokenViewModel @Inject constructor(
     private val tokenManager: TokenManager
 ) : ViewModel() {
 
-    val token = MutableLiveData<String?>()
+    val developerToken = MutableLiveData("")
+    val userToken = MutableLiveData("")
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            tokenManager.getToken().collect {
-                withContext(Dispatchers.Main) {
-                    token.value = it
+            tokenManager.run {
+                getJWTToken().collect {
+                    withContext(Dispatchers.Main) {
+                        developerToken.value = it
+                    }
+                }
+                getUserToken().collect {
+                    withContext(Dispatchers.Main) {
+                        userToken.value = it
+                    }
                 }
             }
         }
     }
 
-    fun saveToken(token: String) {
-        Log.e("Token", "Saved token is $token")
+    fun saveJWTToken(token: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            tokenManager.saveToken(token)
+            tokenManager.saveJWTToken(token)
         }
     }
 
-    fun deleteToken() {
+    fun deleteJWTToken() {
         viewModelScope.launch(Dispatchers.IO) {
-            tokenManager.deleteToken()
+            tokenManager.deleteJWTToken()
+        }
+    }
+
+    fun saveUserToken(token: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            tokenManager.saveUserToken(token)
         }
     }
 }

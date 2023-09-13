@@ -6,5 +6,7 @@ open class MediaType<T : TypeAttributes>(
     val type: String? = null,
     val id: String? = null,
     val href: String? = null,
-    var attributes: T? = null
-)
+) {
+
+    lateinit var attributes: T
+}

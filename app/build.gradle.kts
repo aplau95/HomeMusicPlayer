@@ -24,8 +24,8 @@ android {
 
     defaultConfig {
         applicationId = "com.example.homemusicplayer"
-        minSdk = 29
-        targetSdk = 30
+        minSdk = 21
+        targetSdk = 28
         versionCode = 1
         versionName = "1.0"
 
@@ -167,6 +167,9 @@ dependencies {
     // Feature module Support
     implementation("androidx.navigation:navigation-dynamic-features-fragment:$nav_version")
 
+    implementation("com.squareup.picasso:picasso:2.8")
+
+
 
     implementation("io.coil-kt:coil-compose:2.4.0")
     // Testing Navigation
@@ -188,7 +191,11 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
     implementation("io.github.nefilim.kjwt:kjwt-core:0.9.0")
     implementation("androidx.media:media:1.6.0")
-    
+
+    implementation("androidx.media3:media3-exoplayer:1.0.0")
+    implementation("androidx.media3:media3-exoplayer-dash:1.0.0")
+    implementation("androidx.media3:media3-ui:1.0.0")
+
 }
 
 kapt {

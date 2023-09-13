@@ -3,6 +3,7 @@ package com.example.homemusicplayer.data.apiResponse.mediaTypes.deserializer
 import com.example.homemusicplayer.data.apiResponse.mediaTypes.Album
 import com.example.homemusicplayer.data.apiResponse.mediaTypes.Artist
 import com.example.homemusicplayer.data.apiResponse.mediaTypes.MediaType
+import com.example.homemusicplayer.data.apiResponse.mediaTypes.Playlist
 import com.example.homemusicplayer.data.apiResponse.mediaTypes.Song
 import com.example.homemusicplayer.data.apiResponse.mediaTypes.attributes.TypeAttributes
 import com.google.gson.JsonDeserializationContext
@@ -21,6 +22,7 @@ class TypeResourceDeserializer : JsonDeserializer<MediaType<TypeAttributes>?> {
             "albums" -> context.deserialize(json, Album::class.java)
             "songs" -> context.deserialize(json, Song::class.java)
             "artists" -> context.deserialize(json, Artist::class.java)
+            "playlists" -> context.deserialize(json, Playlist::class.java)
             else -> null
         }
     }

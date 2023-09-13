@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.support.v4.media.MediaBrowserCompat
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -25,6 +26,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mService: TcpServerService
     private var mBound: Boolean = false
 
+    //    private lateinit var mediaBrowserHelper: MediaBrowserHelper
+    private lateinit var mediaBrowser: MediaBrowserCompat
+
+    init {
+        System.loadLibrary("c++_shared")
+        System.loadLibrary("appleMusicSDK")
+    }
+
     inner class Connection : ServiceConnection {
 
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
@@ -41,7 +50,7 @@ class MainActivity : AppCompatActivity() {
                     params["ct"] = "mytestCampaignToken"
                     params["at"] = "mytestAffiliateToken"
                     val intent =
-                        authenticationManager.createIntentBuilder(viewModel.token.value)
+                        authenticationManager.createIntentBuilder(viewModel.developerToken.value)
                             .setHideStartScreen(false)
                             .setStartScreenMessage("Test this")
                             .setContextId("1100742453")
@@ -70,6 +79,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
     override fun onStop() {
         super.onStop()
         unbindService(connection)
@@ -97,7 +107,8 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        viewModel.saveToken(authenticationManager.handleTokenResult(data).musicUserToken)
+        super.onActivityResult(requestCode, resultCode, data)
+        viewModel.saveUserToken(authenticationManager.handleTokenResult(data).musicUserToken)
     }
 
 }
