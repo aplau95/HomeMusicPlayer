@@ -10,7 +10,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.homemusicplayer.data.apiResponse.ApiResponse
 import com.example.homemusicplayer.data.apiResponse.mediaTypes.MediaType
 import com.example.homemusicplayer.viewModel.SearchViewModel
@@ -20,7 +19,7 @@ val testItems = listOf("Hi", "Hello", "Whee")
 @Composable
 fun SearchPage(
     modifier: Modifier,
-    viewModel: SearchViewModel = hiltViewModel(),
+    viewModel: SearchViewModel,
 ) {
 //    val terms by viewModel.terms.collectAsState()
 //    val catalogs by viewModel.catalog.collectAsState()

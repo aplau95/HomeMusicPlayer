@@ -10,7 +10,6 @@ import com.apple.android.music.playback.controller.MediaPlayerController
 import com.apple.android.music.playback.controller.MediaPlayerControllerFactory
 import com.apple.android.music.playback.model.MediaPlayerException
 import com.apple.android.music.playback.model.PlayerQueueItem
-import com.apple.android.music.sdk.testapp.service.MediaSessionManager
 import com.example.homemusicplayer.api.AppleMusicTokenProvider
 import com.example.homemusicplayer.data.SearchRepository
 import dagger.hilt.android.AndroidEntryPoint

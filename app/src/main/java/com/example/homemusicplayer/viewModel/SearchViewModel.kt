@@ -6,13 +6,13 @@ import android.support.v4.media.MediaBrowserCompat
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.apple.android.music.sdk.testapp.service.MediaSessionManager
 import com.example.homemusicplayer.data.SearchRepository
 import com.example.homemusicplayer.data.apiResponse.ApiResponse
 import com.example.homemusicplayer.data.apiResponse.mediaTypes.MediaType
 import com.example.homemusicplayer.data.apiResponse.search.searchResponse.SearchResponse
 import com.example.homemusicplayer.data.apiResponse.search.searchSuggestionsResponse.SearchSuggestionResponse
 import com.example.homemusicplayer.media.MediaPlayerServiceConnection
+import com.example.homemusicplayer.media.MediaSessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,7 +30,6 @@ class SearchViewModel @Inject constructor(
 
     var _terms = MutableStateFlow<ApiResponse<SearchSuggestionResponse>>(ApiResponse.Loading)
     val terms = _terms.asStateFlow()
-
 
     var _catalog = MutableStateFlow<ApiResponse<SearchResponse>>(ApiResponse.Loading)
     val catalog = _catalog.asStateFlow()
@@ -56,20 +55,11 @@ class SearchViewModel @Inject constructor(
                 object : ResultReceiver(null) {
                     override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
                         if (resultCode == MediaSessionManager.RESULT_ADD_QUEUE_ITEMS) {
-//                        for (mediaItem in songs) {
-
-                            mc.addQueueItem(songMetadata.description)
-//                        }
-
-                            mc.transportControls?.prepare()
-
                             serviceConnection.transportControl.playFromMediaId(
                                 songMetadata.description.mediaId,
-                                null
+                                songMetadata.bundle
                             )
                         }
-
-
                     }
                 })
         }
@@ -128,5 +118,6 @@ class SearchViewModel @Inject constructor(
         }
 
         _searchTerm.value = "jmsn"
+
     }
 }

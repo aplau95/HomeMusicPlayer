@@ -54,6 +54,7 @@ fun SearchSuggestionRow(
         horizontalArrangement = Arrangement.Start
     ) {
         Icon(Icons.Rounded.Search, contentDescription = "Search")
+        val searchTerm = searchTerm.lowercase()
         Text(
             text = buildAnnotatedString {
                 if (term.contains(searchTerm)) {

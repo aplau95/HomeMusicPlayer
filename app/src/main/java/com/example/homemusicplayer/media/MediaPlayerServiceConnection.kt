@@ -2,7 +2,6 @@ package com.example.homemusicplayer.media
 
 import android.content.ComponentName
 import android.content.Context
-import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
@@ -28,6 +27,8 @@ class MediaPlayerServiceConnection @Inject constructor(
 
     private val mediaBrowserServiceCallback = MediaBrowserConnectionCallback(context)
 
+    private val mediaControllerCallback = MediaControllerCallback()
+
     private val mediaBrowser = MediaBrowserCompat(
         context,
         ComponentName(context, PlaybackSessionService::class.java),
@@ -35,6 +36,7 @@ class MediaPlayerServiceConnection @Inject constructor(
         null
     ).apply {
         connect()
+
     }
 
     fun subscribe(parentId: String, subscriptionCallback: MediaBrowserCompat.SubscriptionCallback) {
@@ -66,6 +68,7 @@ class MediaPlayerServiceConnection @Inject constructor(
                 context,
                 mediaBrowser.sessionToken
             ).apply {
+                this.registerCallback(mediaControllerCallback)
             }
         }
 
@@ -80,26 +83,16 @@ class MediaPlayerServiceConnection @Inject constructor(
 
     fun searchQuery(query: String) {
         if (query.isEmpty()) return
-        mediaBrowser.search(query, null, object : MediaBrowserCompat.SearchCallback() {
-            override fun onSearchResult(
-                query: String,
-                extras: Bundle?,
-                items: MutableList<MediaBrowserCompat.MediaItem>
-            ) {
-                Log.e("MediaPlayerServiceConn", "items are ${items.size}")
-            }
-        })
+//        mediaBrowser.search(query, null, object : MediaBrowserCompat.SearchCallback() {
+//            override fun onSearchResult(
+//                query: String,
+//                extras: Bundle?,
+//                items: MutableList<MediaBrowserCompat.MediaItem>
+//            ) {
+//                Log.e("MediaPlayerServiceConn", "items are ${items.size}")
+//            }
+//        })
     }
-
-
-    private inner class MediaBrowserCallback : MediaBrowserCompat.ItemCallback() {
-
-        override fun onItemLoaded(item: MediaBrowserCompat.MediaItem?) {
-            super.onItemLoaded(item)
-        }
-
-    }
-
 
     private inner class MediaControllerCallback : MediaControllerCompat.Callback() {
 
@@ -109,8 +102,14 @@ class MediaPlayerServiceConnection @Inject constructor(
         }
 
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+            Log.e("MediaControllerCallback", "onMetadataChanged")
             super.onMetadataChanged(metadata)
 
+        }
+
+        override fun onQueueTitleChanged(title: CharSequence?) {
+            Log.e("MediaControllerCallback", "onQueueTitleChanged ${title}")
+            super.onQueueTitleChanged(title)
         }
 
     }

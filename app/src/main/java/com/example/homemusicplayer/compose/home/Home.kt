@@ -20,6 +20,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LibraryMusic
+import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,9 +35,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.homemusicplayer.R
 import com.example.homemusicplayer.compose.library.Library
+import com.example.homemusicplayer.compose.playing.Playing
 import com.example.homemusicplayer.compose.search.SearchPage
+import com.example.homemusicplayer.viewModel.SearchViewModel
 import kotlinx.coroutines.launch
 
 
@@ -46,6 +50,7 @@ enum class HomePage(
 ) {
 
     LIBRARY(R.string.library, Icons.Filled.LibraryMusic),
+    PLAYING(R.string.playing, Icons.Filled.PlayCircle),
     SEARCH(R.string.search, Icons.Filled.Search),
 
 }
@@ -53,13 +58,14 @@ enum class HomePage(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
+
     val pagerState = rememberPagerState(
         initialPage = 1,
         initialPageOffsetFraction = 0.0f
     ) {
-        2
+        3
     }
 
     Scaffold(bottomBar = { TabBar(pagerState = pagerState) }) {
@@ -104,6 +110,7 @@ private fun TabBar(
 private fun HomeNavBar(
     pagerState: PagerState,
     modifier: Modifier = Modifier,
+    viewModel: SearchViewModel = hiltViewModel()
 ) {
 
 
@@ -139,7 +146,8 @@ private fun HomeNavBar(
                             Text(
                                 text = when (index) {
                                     0 -> stringResource(id = R.string.library)
-                                    1 -> stringResource(id = R.string.search)
+                                    1 -> stringResource(id = R.string.playing)
+                                    2 -> stringResource(id = R.string.search)
                                     else -> stringResource(id = R.string.search)
                                 },
                                 color = androidx.compose.material.MaterialTheme.colors.onBackground,
@@ -158,12 +166,20 @@ private fun HomeNavBar(
                                 .fillMaxSize()
                         )
                     }
-
                     1 -> {
-                        SearchPage(
+                        Playing(
                             modifier = Modifier
                                 .padding(it)
                                 .fillMaxSize()
+                        )
+                    }
+
+                    2 -> {
+                        SearchPage(
+                            modifier = Modifier
+                                .padding(it)
+                                .fillMaxSize(),
+                            viewModel
                         )
                     }
                 }

@@ -1,4 +1,4 @@
-package com.apple.android.music.sdk.testapp.service
+package com.example.homemusicplayer.media
 
 import android.content.Intent
 import android.net.Uri
@@ -12,6 +12,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import com.apple.android.music.playback.controller.MediaPlayerController
 import com.apple.android.music.playback.model.ErrorConditionException
+import com.apple.android.music.playback.model.MediaContainerType
 import com.apple.android.music.playback.model.MediaItemType
 import com.apple.android.music.playback.model.MediaPlayerException
 import com.apple.android.music.playback.model.PlaybackRepeatMode
@@ -19,6 +20,8 @@ import com.apple.android.music.playback.model.PlaybackShuffleMode
 import com.apple.android.music.playback.model.PlaybackState
 import com.apple.android.music.playback.model.PlayerQueueItem
 import com.apple.android.music.playback.queue.CatalogPlaybackQueueItemProvider
+import com.example.homemusicplayer.media.MediaExtensions.CONTAINER_TYPE
+import com.example.homemusicplayer.media.MediaExtensions.ITEM_TYPE
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -28,7 +31,8 @@ internal class MediaSessionManager(
     private val playerController: MediaPlayerController,
     mediaSession: MediaSessionCompat
 ) :
-    MediaSessionCompat.Callback(), MediaPlayerController.Listener {
+    MediaSessionCompat.Callback(),
+    MediaPlayerController.Listener {
 
     private val mediaSession: MediaSessionCompat
     private val metadataBuilder: MediaMetadataCompat.Builder
@@ -56,6 +60,10 @@ internal class MediaSessionManager(
 
     }
 
+    fun addListener(listener: MediaPlayerController.Listener) {
+        playerController.addListener(listener)
+    }
+
     override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
         return false
     }
@@ -72,30 +80,24 @@ internal class MediaSessionManager(
         playerController.play()
     }
 
-    override fun onPlayFromMediaId(mediaId: String, extras: Bundle) {
+    override fun onPlayFromMediaId(mediaId: String, extras: Bundle?) {
 
 
-//        val builder = CatalogPlaybackQueueItemProvider.Builder()
-//        var containerType = MediaContainerType.NONE
-//        var itemType = MediaItemType.UNKNOWN
-//        if (extras != null) {
-//            containerType = extras.getInt("containerType", MediaContainerType.NONE)
-//            itemType = extras.getInt("itemType", MediaItemType.UNKNOWN)
-//        }
-//        if (containerType != MediaContainerType.NONE) {
-//            builder.containers(containerType, mediaId)
-//        } else {
-//            builder.items(itemType, mediaId)
-//        }
-//        playerController.prepare(builder.build(), true)
-
-
-        val queueProviderBuilder = CatalogPlaybackQueueItemProvider.Builder()
-        val tracksIds = queueItems.map { it.description.mediaId }
-        queueProviderBuilder.items(MediaItemType.SONG, *tracksIds.toTypedArray())
-        queueProviderBuilder.startItemIndex(0)
-        playerController.prepare(queueProviderBuilder.build(), true)
-        Log.e(TAG, "onPlayFromMediaId")
+        val builder = CatalogPlaybackQueueItemProvider.Builder()
+        var containerType = MediaContainerType.NONE
+        var itemType = MediaItemType.UNKNOWN
+        if (extras != null) {
+            containerType = extras.getLong(CONTAINER_TYPE, MediaContainerType.NONE.toLong()).toInt()
+            itemType = extras.getLong(ITEM_TYPE, MediaItemType.UNKNOWN.toLong()).toInt()
+        }
+        if (containerType != MediaContainerType.NONE) {
+            Log.e("MediaSessionManager", "${containerType}")
+            builder.containers(containerType, mediaId)
+        } else {
+            Log.e("MediaSessionManager", "${itemType}")
+            builder.items(itemType, mediaId)
+        }
+        playerController.prepare(builder.build(), true)
     }
 
     override fun onPlayFromSearch(query: String, extras: Bundle) {}
@@ -144,15 +146,15 @@ internal class MediaSessionManager(
     }
 
     override fun onAddQueueItem(description: MediaDescriptionCompat, index: Int) {
-        Log.d(TAG, "onRemoveQueueItem()")
+        Log.e(TAG, "onRemoveQueueItem()")
     }
 
     override fun onRemoveQueueItem(description: MediaDescriptionCompat) {
-        Log.d(TAG, "onRemoveQueueItem()")
+        Log.e(TAG, "onRemoveQueueItem()")
     }
 
     override fun onPlayerStateRestored(playerController: MediaPlayerController) {
-        Log.d(TAG, "onPlayerStateRestored()")
+        Log.e(TAG, "onPlayerStateRestored()")
     }
 
     override fun onPlaybackStateChanged(
@@ -160,21 +162,21 @@ internal class MediaSessionManager(
         previousState: Int,
         currentState: Int
     ) {
-        Log.d(
+        Log.e(
             TAG,
             "onPlaybackStateChanged() prevState: $previousState currentState: $currentState"
         )
     }
 
     override fun onPlaybackStateUpdated(playerController: MediaPlayerController) {
-        Log.d(TAG, "onPlaybackStateUpdated()")
+        Log.e(TAG, "onPlaybackStateUpdated()")
     }
 
     override fun onBufferingStateChanged(
         playerController: MediaPlayerController,
         buffering: Boolean
     ) {
-        Log.d(
+        Log.e(
             TAG,
             "onBufferingStateChanged() buffering: $buffering"
         )
@@ -185,12 +187,13 @@ internal class MediaSessionManager(
         previousItem: PlayerQueueItem?,
         currentItem: PlayerQueueItem?
     ) {
-        Log.d(
+        Log.e(
             TAG,
             "onCurrentItemChanged() prevItemQueueId: " + (previousItem?.playbackQueueId
                 ?: -1)
                     + " currItemQueueId: " + (currentItem?.playbackQueueId ?: -1)
         )
+
 //        updateMetaData(previousItem, currentItem)
 //        updatePlaybackState(playerController.playbackState, playerController.isBuffering)
     }
@@ -200,7 +203,7 @@ internal class MediaSessionManager(
         queueItem: PlayerQueueItem,
         endPosition: Long
     ) {
-        Log.d(
+        Log.e(
             TAG,
             "onItemEnded() queueItem: " + queueItem.playbackQueueId + " endPosition: " + endPosition
         )
@@ -210,14 +213,14 @@ internal class MediaSessionManager(
         playerController: MediaPlayerController,
         currentItem: PlayerQueueItem
     ) {
-        Log.d(TAG, "onMetadataUpdated() item: " + currentItem.playbackQueueId)
+        Log.e(TAG, "onMetadataUpdated() item: " + currentItem.playbackQueueId)
     }
 
     override fun onPlaybackQueueChanged(
         playerController: MediaPlayerController,
         playbackQueueItems: List<PlayerQueueItem>
     ) {
-        Log.d(TAG, "onPlaybackQueueChanged() numOfItems: " + playbackQueueItems.size)
+        Log.e(TAG, "onPlaybackQueueChanged() numOfItems: " + playbackQueueItems.size)
     }
 
     override fun onPlaybackQueueItemsAdded(
@@ -226,7 +229,7 @@ internal class MediaSessionManager(
         containerType: Int,
         itemType: Int
     ) {
-        Log.d(
+        Log.e(
             TAG,
             "onPlaybackQueueItemsAdded() insertionType: $queueInsertionType containerType: $containerType itemType: $itemType"
         )
@@ -236,10 +239,10 @@ internal class MediaSessionManager(
         playerController: MediaPlayerController,
         error: MediaPlayerException
     ) {
-        Log.d(TAG, "onPlaybackError()")
+        Log.e(TAG, "onPlaybackError()")
         val t = error.cause
         if (t is ErrorConditionException) {
-            Log.d(TAG, "onPlaybackError() errorCode: " + t.errorCode)
+            Log.e(TAG, "onPlaybackError() errorCode: " + t.errorCode)
         }
     }
 
@@ -247,7 +250,7 @@ internal class MediaSessionManager(
         playerController: MediaPlayerController,
         @PlaybackRepeatMode currentRepeatMode: Int
     ) {
-        Log.d(TAG, "onPlaybackRepeatModeChanged()")
+        Log.e(TAG, "onPlaybackRepeatModeChanged()")
         mediaSession.setRepeatMode(convertRepeatMode(currentRepeatMode))
     }
 
@@ -255,7 +258,7 @@ internal class MediaSessionManager(
         playerController: MediaPlayerController,
         @PlaybackShuffleMode currentShuffleMode: Int
     ) {
-        Log.d(TAG, "onPlaybackShuffleModeChanged()")
+        Log.e(TAG, "onPlaybackShuffleModeChanged()")
         mediaSession.setShuffleMode(convertShuffleMode(currentShuffleMode))
     }
 
