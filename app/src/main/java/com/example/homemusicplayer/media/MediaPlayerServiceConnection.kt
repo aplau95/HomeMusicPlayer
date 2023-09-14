@@ -3,13 +3,11 @@ package com.example.homemusicplayer.media
 import android.content.ComponentName
 import android.content.Context
 import android.os.Bundle
-import android.provider.MediaStore
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +23,6 @@ class MediaPlayerServiceConnection @Inject constructor(
     private val _isConnected: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isConnected = _isConnected.asStateFlow()
 
-    val currentPlayingAudio = mutableStateOf<MediaStore.Audio?>(null)
 
     lateinit var mediaControllerCompat: MediaControllerCompat
 
@@ -39,6 +36,18 @@ class MediaPlayerServiceConnection @Inject constructor(
     ).apply {
         connect()
     }
+
+    fun subscribe(parentId: String, subscriptionCallback: MediaBrowserCompat.SubscriptionCallback) {
+        mediaBrowser.subscribe(parentId, subscriptionCallback)
+    }
+
+    fun unsubscribe(
+        parentId: String,
+        subscriptionCallback: MediaBrowserCompat.SubscriptionCallback
+    ) {
+        mediaBrowser.unsubscribe(parentId, subscriptionCallback)
+    }
+
 
     val transportControl: MediaControllerCompat.TransportControls
         get() = mediaControllerCompat.transportControls
@@ -70,6 +79,7 @@ class MediaPlayerServiceConnection @Inject constructor(
     }
 
     fun searchQuery(query: String) {
+        if (query.isEmpty()) return
         mediaBrowser.search(query, null, object : MediaBrowserCompat.SearchCallback() {
             override fun onSearchResult(
                 query: String,

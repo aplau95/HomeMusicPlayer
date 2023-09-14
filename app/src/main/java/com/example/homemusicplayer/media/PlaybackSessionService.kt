@@ -2,15 +2,10 @@ package com.example.homemusicplayer.media
 
 import android.app.PendingIntent
 import android.os.Bundle
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Message
-import android.os.Process
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import androidx.media.MediaBrowserServiceCompat
-import androidx.media3.exoplayer.ExoPlayer
 import com.apple.android.music.playback.controller.MediaPlayerController
 import com.apple.android.music.playback.controller.MediaPlayerControllerFactory
 import com.apple.android.music.playback.model.MediaPlayerException
@@ -22,10 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PlaybackSessionService : MediaBrowserServiceCompat(), Handler.Callback {
-
-    @Inject
-    lateinit var exoPlayer: ExoPlayer
+class PlaybackSessionService : MediaBrowserServiceCompat() {
 
     @Inject
     lateinit var searchRepository: SearchRepository
@@ -34,8 +26,6 @@ class PlaybackSessionService : MediaBrowserServiceCompat(), Handler.Callback {
 
     private lateinit var mediaSession: MediaSessionCompat
 
-    lateinit var serviceHandlerThread: HandlerThread
-    lateinit var serviceHandler: Handler
     lateinit var mediaProvider: MediaProvider
 
     companion object {
@@ -63,16 +53,8 @@ class PlaybackSessionService : MediaBrowserServiceCompat(), Handler.Callback {
     override fun onCreate() {
         super.onCreate()
 
-        serviceHandlerThread =
-            HandlerThread("MediaPlaybackService:Handler", Process.THREAD_PRIORITY_BACKGROUND)
-        serviceHandlerThread.start()
-        serviceHandler = Handler(serviceHandlerThread.looper, this)
-
-        playerController = MediaPlayerControllerFactory.createLocalController(
-            this,
-            serviceHandler,
-            AppleMusicTokenProvider(this)
-        )
+        playerController =
+            MediaPlayerControllerFactory.createLocalController(this, AppleMusicTokenProvider(this))
         playerController.addListener(MediaPlayerControllerListener())
 
         val sessionActivityIntent = packageManager
@@ -96,8 +78,7 @@ class PlaybackSessionService : MediaBrowserServiceCompat(), Handler.Callback {
                 MediaSessionManager(
                     playerController,
                     this
-                ),
-                serviceHandler
+                )
             )
         }
 
@@ -129,36 +110,16 @@ class PlaybackSessionService : MediaBrowserServiceCompat(), Handler.Callback {
     }
 
 
-    override fun handleMessage(msg: Message): Boolean {
-//        when (msg.what) {
-//            MediaPlaybackService.MESSAGE_START_COMMAND -> {
-//                val messageIntent = msg.obj
-//                val mediaButtonEvent = handleIntent(mediaSession, messageIntent)
-//                if (mediaButtonEvent == null) {
-//                    handleIntent()
-//                }
-//                return true
-//            }
-//
-//            MediaPlaybackService.MESSAGE_TASK_REMOVED -> {
-//                stopSelf()
-//                return true
-//            }
-//        }
-        return false
-    }
-
     inner class MediaPlayerControllerListener : MediaPlayerController.Listener {
 
         override fun onPlayerStateRestored(p0: MediaPlayerController) {
         }
 
-        override fun onPlaybackStateChanged(p0: MediaPlayerController, p1: Int, currentState: Int) {
-//        when (currentState) {
-//            PlaybackState.PLAYING -> mediaPlayerNotificationManager.start()
-//            PlaybackState.PAUSED -> playbackNotificationManager.stop(false)
-//            PlaybackState.STOPPED -> playbackNotificationManager.stop(true)
-//        }
+        override fun onPlaybackStateChanged(
+            p0: MediaPlayerController,
+            p1: Int,
+            currentState: Int
+        ) {
         }
 
         override fun onPlaybackStateUpdated(p0: MediaPlayerController) {

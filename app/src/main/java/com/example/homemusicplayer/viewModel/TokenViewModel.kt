@@ -1,5 +1,6 @@
 package com.example.homemusicplayer.viewModel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,11 +23,13 @@ class TokenViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             tokenManager.run {
                 getJWTToken().collect {
+                    Log.e("TokenViewModel", "developer token: $it")
                     withContext(Dispatchers.Main) {
                         developerToken.value = it
                     }
                 }
                 getUserToken().collect {
+                    Log.e("TokenViewModel", "userToken token: $it")
                     withContext(Dispatchers.Main) {
                         userToken.value = it
                     }

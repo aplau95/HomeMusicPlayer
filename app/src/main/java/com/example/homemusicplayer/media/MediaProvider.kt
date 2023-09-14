@@ -6,10 +6,13 @@ import android.util.Log
 import androidx.media.MediaBrowserServiceCompat
 import com.example.homemusicplayer.data.SearchRepository
 import com.example.homemusicplayer.data.apiResponse.ApiResponse
+import com.example.homemusicplayer.data.apiResponse.mediaTypes.MediaType
 import com.example.homemusicplayer.data.apiResponse.mediaTypes.Song
+import com.example.homemusicplayer.data.apiResponse.mediaTypes.attributes.TypeAttributes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.TreeMap
 
 
 /**
@@ -29,6 +32,8 @@ class MediaProvider(
 
     private val scope = CoroutineScope(Dispatchers.IO)
     private val mainThread = CoroutineScope(Dispatchers.Main)
+
+    private var searchResultsMetaData = TreeMap<String, MediaType<TypeAttributes>>()
 
     fun searchQuery(
         query: String,

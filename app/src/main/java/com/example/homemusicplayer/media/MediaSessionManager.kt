@@ -73,6 +73,23 @@ internal class MediaSessionManager(
     }
 
     override fun onPlayFromMediaId(mediaId: String, extras: Bundle) {
+
+
+//        val builder = CatalogPlaybackQueueItemProvider.Builder()
+//        var containerType = MediaContainerType.NONE
+//        var itemType = MediaItemType.UNKNOWN
+//        if (extras != null) {
+//            containerType = extras.getInt("containerType", MediaContainerType.NONE)
+//            itemType = extras.getInt("itemType", MediaItemType.UNKNOWN)
+//        }
+//        if (containerType != MediaContainerType.NONE) {
+//            builder.containers(containerType, mediaId)
+//        } else {
+//            builder.items(itemType, mediaId)
+//        }
+//        playerController.prepare(builder.build(), true)
+
+
         val queueProviderBuilder = CatalogPlaybackQueueItemProvider.Builder()
         val tracksIds = queueItems.map { it.description.mediaId }
         queueProviderBuilder.items(MediaItemType.SONG, *tracksIds.toTypedArray())

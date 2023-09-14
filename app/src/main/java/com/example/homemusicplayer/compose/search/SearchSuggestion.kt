@@ -56,7 +56,7 @@ fun SearchSuggestionRow(
         Icon(Icons.Rounded.Search, contentDescription = "Search")
         Text(
             text = buildAnnotatedString {
-                if(term.contains(searchTerm)) {
+                if (term.contains(searchTerm)) {
                     withStyle(
                         style = SpanStyle(
                             color = Color.Gray
@@ -73,6 +73,14 @@ fun SearchSuggestionRow(
                         )
                     ) {
                         append(term.substringAfter(searchTerm))
+                    }
+                } else {
+                    withStyle(
+                        style = SpanStyle(
+                            color = Color.Gray
+                        )
+                    ) {
+                        append(term)
                     }
                 }
             },

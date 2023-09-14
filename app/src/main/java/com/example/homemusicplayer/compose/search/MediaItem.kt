@@ -31,7 +31,7 @@ import com.example.homemusicplayer.data.apiResponse.mediaTypes.attributes.Artist
 @Composable
 fun MediaTypeItem(
     resource: MediaType<*>,
-    playMedia: (Song) -> Unit,
+    playMedia: (MediaType<*>) -> Unit,
 ) {
 
     val color = androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
@@ -43,9 +43,12 @@ fun MediaTypeItem(
             .fillMaxWidth()
             .height(80.dp)
             .clickable {
-                if (resource is Song) {
-                    playMedia(resource)
-                }
+                playMedia(resource)
+//                when(resource) {
+//                    is Song -> playMedia(resource)
+//                    is Artist -> playMedia(resource)
+//                    is Album -> playMedia(resource)
+//                }
             }
             .drawBehind {
                 val strokeWidth = density * .7f

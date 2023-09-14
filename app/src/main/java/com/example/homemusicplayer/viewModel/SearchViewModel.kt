@@ -2,13 +2,14 @@ package com.example.homemusicplayer.viewModel
 
 import android.os.Bundle
 import android.os.ResultReceiver
+import android.support.v4.media.MediaBrowserCompat
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.apple.android.music.sdk.testapp.service.MediaSessionManager
 import com.example.homemusicplayer.data.SearchRepository
 import com.example.homemusicplayer.data.apiResponse.ApiResponse
-import com.example.homemusicplayer.data.apiResponse.mediaTypes.Song
+import com.example.homemusicplayer.data.apiResponse.mediaTypes.MediaType
 import com.example.homemusicplayer.data.apiResponse.search.searchResponse.SearchResponse
 import com.example.homemusicplayer.data.apiResponse.search.searchSuggestionsResponse.SearchSuggestionResponse
 import com.example.homemusicplayer.media.MediaPlayerServiceConnection
@@ -45,9 +46,9 @@ class SearchViewModel @Inject constructor(
     var _searchPageState = MutableStateFlow<ApiResponse<SearchPageState>>(ApiResponse.Loading)
     val searchPageState = _searchPageState.asStateFlow()
 
-    fun playMedia(song: Song) {
-        Log.e("SearchViewModel", "id is ${song.id}")
-        val songMetadata = song.toMediaMetadataCompat()
+    fun playMedia(mediaType: MediaType<*>) {
+        Log.e("SearchViewModel", "id is ${mediaType.id}")
+        val songMetadata = mediaType.toMediaMetadataCompat()
         serviceConnection.mediaControllerCompat.let { mc ->
             mc.sendCommand(
                 MediaSessionManager.COMMAND_SWAP_QUEUE,
@@ -108,6 +109,16 @@ class SearchViewModel @Inject constructor(
         serviceConnection.searchQuery(text)
     }
 
+    inner class MediaBrowserSubscription : MediaBrowserCompat.SubscriptionCallback() {
+
+        override fun onChildrenLoaded(
+            parentId: String,
+            children: MutableList<MediaBrowserCompat.MediaItem>
+        ) {
+            super.onChildrenLoaded(parentId, children)
+        }
+    }
+
 
     init {
         viewModelScope.launch {
@@ -116,6 +127,6 @@ class SearchViewModel @Inject constructor(
             }
         }
 
-        _searchTerm.value = "harry"
+        _searchTerm.value = "jmsn"
     }
 }

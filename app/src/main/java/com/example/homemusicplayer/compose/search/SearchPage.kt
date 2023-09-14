@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.homemusicplayer.data.apiResponse.ApiResponse
-import com.example.homemusicplayer.data.apiResponse.mediaTypes.Song
+import com.example.homemusicplayer.data.apiResponse.mediaTypes.MediaType
 import com.example.homemusicplayer.viewModel.SearchViewModel
 
 val testItems = listOf("Hi", "Hello", "Whee")
@@ -42,7 +42,7 @@ fun SearchPage(
     modifier: Modifier,
     searchPageState: ApiResponse<SearchViewModel.SearchPageState>,
     onSearch: (String) -> Unit,
-    playMedia: (Song) -> Unit,
+    playMedia: (MediaType<*>) -> Unit,
     searchTerm: String
 ) {
 
@@ -58,16 +58,24 @@ fun SearchPage(
                 val catalog = searchPageState.data.searchCatalog.results?.topResults?.data
                 val suggestions = searchPageState.data.termSuggestions.results.termSuggestion
                 LazyColumn {
-                    items(count = suggestions.size) { index ->
+                    items(
+                        count = suggestions.size,
+                        key = {
+                            suggestions[it].searchTerm
+                        }
+                    ) { index ->
                         SearchSuggestionRow(
                             term = suggestions[index].searchTerm,
                             searchTerm,
                             onSearch
                         )
                     }
-                    catalog?.let {
-                        items(count = it.size) { index ->
-                            MediaTypeItem(it[index], playMedia)
+                    catalog?.let { mediaList ->
+                        items(
+                            count = mediaList.size,
+                            key = { mediaList[it].id!! }
+                        ) { index ->
+                            MediaTypeItem(mediaList[index], playMedia)
                         }
                     }
 

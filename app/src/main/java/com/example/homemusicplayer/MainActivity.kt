@@ -7,6 +7,7 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.MediaBrowserCompat
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -45,12 +46,13 @@ class MainActivity : AppCompatActivity() {
             mService.trigger.observe(this@MainActivity) {
                 println("Trigger is $it")
                 if (it) {
+                    viewModel
                     // Use createIntentBuilder api to create the Intentbuilder which the 3rd party app can use to customize a few things
                     val params: HashMap<String, String> = HashMap<String, String>()
                     params["ct"] = "mytestCampaignToken"
                     params["at"] = "mytestAffiliateToken"
                     val intent =
-                        authenticationManager.createIntentBuilder(viewModel.developerToken.value)
+                        authenticationManager.createIntentBuilder("eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjhQRjgyNlVCVk4ifQ.eyJpc3MiOiI0TjNTVFY3NTVXIiwiaWF0IjoxNjk0NjIxODI4LCJleHAiOjE2OTQ3MDgyMjh9.wVreV7GBZfgmWphx6FRAWOIRnjXSeJ1-OPnCXUti0eog_4m5UocTj9x_dInFAVvfEkSAKDhEU4UoxugDi29-OQ")
                             .setHideStartScreen(false)
                             .setStartScreenMessage("Test this")
                             .setContextId("1100742453")
@@ -108,7 +110,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        viewModel.saveUserToken(authenticationManager.handleTokenResult(data).musicUserToken)
+        val result = authenticationManager.handleTokenResult(data)
+
+        if (result.isError) {
+            val error = result.error
+            Log.e("HomeActivity", "error: $error")
+        } else {
+            viewModel.saveUserToken(authenticationManager.handleTokenResult(data).musicUserToken)
+        }
+
     }
 
 }
