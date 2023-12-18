@@ -19,11 +19,11 @@ package com.example.homemusicplayer.ui
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.graphics.Color
@@ -118,7 +118,7 @@ fun HomeMusicPlayerTheme(
         val systemUiController = rememberSystemUiController()
         val useDarkIcons = !isSystemInDarkTheme()
         val window = (view.context as Activity).window
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.setDecorFitsSystemWindows(window, true)
         DisposableEffect(systemUiController, useDarkIcons) {
             // Update all of the system bar colors to be transparent, and use
             // dark icons if we're in light theme

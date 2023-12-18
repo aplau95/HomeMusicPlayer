@@ -2,6 +2,7 @@ package com.example.homemusicplayer.data.apiResponse.search.searchSuggestionsRes
 
 import com.google.gson.annotations.SerializedName
 
+// Destructuring JSON response
 data class Suggestion(
     @field:SerializedName("suggestions") val termSuggestion: List<TermSuggestion>,
 )

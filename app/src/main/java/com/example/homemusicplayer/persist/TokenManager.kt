@@ -8,7 +8,11 @@ import com.example.homemusicplayer.di.dataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+/**
+ * Helper class that saves generated tokens into our datastore
+ */
 class TokenManager(private val context: Context) {
+
     companion object {
 
         val JWT_TOKEN_KEY = stringPreferencesKey("jwt_token")

@@ -1,6 +1,8 @@
 package com.example.homemusicplayer.data.apiResponse
 
+// Creates an class out of the API response to be parsed via type inference
 sealed class ApiResponse<out T> {
+
     object Loading : ApiResponse<Nothing>()
 
     data class Success<out T>(

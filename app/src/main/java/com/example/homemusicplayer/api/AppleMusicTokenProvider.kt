@@ -3,6 +3,7 @@ package com.example.homemusicplayer.api
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import com.apple.android.sdk.authentication.TokenProvider
+import com.example.homemusicplayer.BuildConfig
 import com.example.homemusicplayer.di.dataStore
 import com.example.homemusicplayer.persist.TokenManager
 import kotlinx.coroutines.CoroutineScope
@@ -10,20 +11,24 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
+
 /**
- * Copyright (C) 2018 Apple, Inc. All rights reserved.
+ * This is the implementation of the TokenProvider interface that hooks into the
+ * MediaControllerFactory to support music playback, as defined by Apple's documentation
+ *
+ * Currently, we need a way to hook into the saved tokens that are stored in the TokenManage;
+ * this is yet to be done
  */
 class AppleMusicTokenProvider(
     private val context: Context
 ) : TokenProvider {
 
 
-//    private val JWT_TOKEN_KEY = stringPreferencesKey("jwt_token")
-//    private val USER_TOKEN_KEY = stringPreferencesKey("user_token")
-
+    // This does nothing right now are we are still unable to get the tokens in a static form
     val userToken = MutableLiveData("")
     val devToken = MutableLiveData("")
 
+    // This does nothing right now are we are still unable to get the tokens in a static form
     init {
         CoroutineScope(Dispatchers.IO).launch {
             context.dataStore.data.map { preferences ->
@@ -41,15 +46,11 @@ class AppleMusicTokenProvider(
     }
 
     override fun getDeveloperToken(): String {
-        return "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjhQRjgyNlVCVk4ifQ.eyJpc3MiOiI0TjNTVFY3NTVXIiwiaWF0IjoxNjk0NjQ4MzQ3LCJleHAiOjE2OTQ3MzQ3NDd9.2Sv-OPE9l68L_lp-zeSOh8Q5oJDg2n9kf4rx76Qmlww7e8kLeqHMpPqBgLgArfqw-79iCjpx0ocUG7OEv0Bvfw"
-//        Log.e("AppleMusicTokenProvider", "developer token is ${devToken.value}")
-//        return devToken.value!!
+        return BuildConfig.developerToken
     }
 
     override fun getUserToken(): String {
-//        Log.e("AppleMusicTokenProvider", "user token is ${userToken.value}")
-        return "Apb6oRz8Xf3ax7x6Q4AXzR/pC9+apMF854vRv0bozsx1rkMnSWssFQxF3+zhTXrJVLbZpFmhAkq1YjvtzQb+4qO+kgkUwhGE4Ldiy4tOdTlsF62+3Vt9RtRGmNnaEB6oGdl8qspZ0DLjCNHPnbFuOcY+mxt/UUn2qM/ibPt8d33qQf6hhRGGLxyhvkosBPczHeY3CXpvPKcnysDocwN0d5aVDaBoVcvvMCkLkH2/O2mx4LJhHA=="
-//        return userToken.value!!
+        return BuildConfig.userToken
     }
 
 

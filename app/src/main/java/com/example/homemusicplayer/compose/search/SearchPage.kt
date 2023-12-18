@@ -14,15 +14,15 @@ import com.example.homemusicplayer.data.apiResponse.ApiResponse
 import com.example.homemusicplayer.data.apiResponse.mediaTypes.MediaType
 import com.example.homemusicplayer.viewModel.SearchViewModel
 
-val testItems = listOf("Hi", "Hello", "Whee")
-
+/**
+ * The search page wrapper. We use this to destructure references that are within the
+ * SearchViewModel and its functions
+ */
 @Composable
 fun SearchPage(
     modifier: Modifier,
     viewModel: SearchViewModel,
 ) {
-//    val terms by viewModel.terms.collectAsState()
-//    val catalogs by viewModel.catalog.collectAsState()
     val searchPageState by viewModel.searchPageState.collectAsState()
 
     val searchTerm by viewModel.searchTerm.collectAsState()
@@ -36,6 +36,9 @@ fun SearchPage(
     )
 }
 
+/**
+ * Overloaded function renders the state delineated by the SearchViewModel.
+ */
 @Composable
 fun SearchPage(
     modifier: Modifier,
@@ -57,6 +60,9 @@ fun SearchPage(
                 val catalog = searchPageState.data.searchCatalog.results?.topResults?.data
                 val suggestions = searchPageState.data.termSuggestions.results.termSuggestion
                 LazyColumn {
+
+                    // Takes the list of suggestions that originate from Apple Musics search suggestion
+                    // API response and renders them
                     items(
                         count = suggestions.size,
                         key = {
@@ -69,6 +75,9 @@ fun SearchPage(
                             onSearch
                         )
                     }
+
+                    // Takes the list of catalog items that originate from Apple Musics catalog
+                    // API response and renders them
                     catalog?.let { mediaList ->
                         items(
                             count = mediaList.size,

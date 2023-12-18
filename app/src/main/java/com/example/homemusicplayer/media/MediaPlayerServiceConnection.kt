@@ -12,6 +12,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
+/**
+ * Responsible for initializing media playback. It houses the MediaControllerCompat which intakes
+ * the PlaybackSessionService. This creates the bridge between the native Android MediaBrowserCompat
+ * and Apple's special MediaPlayerController.
+ */
 class MediaPlayerServiceConnection @Inject constructor(
     @ApplicationContext context: Context
 ) {
@@ -39,23 +44,10 @@ class MediaPlayerServiceConnection @Inject constructor(
 
     }
 
-    fun subscribe(parentId: String, subscriptionCallback: MediaBrowserCompat.SubscriptionCallback) {
-        mediaBrowser.subscribe(parentId, subscriptionCallback)
-    }
-
-    fun unsubscribe(
-        parentId: String,
-        subscriptionCallback: MediaBrowserCompat.SubscriptionCallback
-    ) {
-        mediaBrowser.unsubscribe(parentId, subscriptionCallback)
-    }
-
 
     val transportControl: MediaControllerCompat.TransportControls
         get() = mediaControllerCompat.transportControls
 
-    val rootMediaId: String
-        get() = mediaBrowser.root
 
     private inner class MediaBrowserConnectionCallback(
         private val context: Context
@@ -83,17 +75,9 @@ class MediaPlayerServiceConnection @Inject constructor(
 
     fun searchQuery(query: String) {
         if (query.isEmpty()) return
-//        mediaBrowser.search(query, null, object : MediaBrowserCompat.SearchCallback() {
-//            override fun onSearchResult(
-//                query: String,
-//                extras: Bundle?,
-//                items: MutableList<MediaBrowserCompat.MediaItem>
-//            ) {
-//                Log.e("MediaPlayerServiceConn", "items are ${items.size}")
-//            }
-//        })
     }
 
+    // Notification from MediaControllerCompat of any state changes
     private inner class MediaControllerCallback : MediaControllerCompat.Callback() {
 
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {

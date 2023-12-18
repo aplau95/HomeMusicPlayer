@@ -21,6 +21,10 @@ import java.net.ServerSocket
 import java.net.Socket
 import java.util.concurrent.atomic.AtomicBoolean
 
+/**
+ * Services that runs a TCP Server which is used to listen to commands sent through the specific
+ * socket of our local network
+ */
 @AndroidEntryPoint
 class TcpServerService : Service() {
 

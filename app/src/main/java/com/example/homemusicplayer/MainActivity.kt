@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.support.v4.media.MediaBrowserCompat
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -27,14 +26,22 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mService: TcpServerService
     private var mBound: Boolean = false
 
-    //    private lateinit var mediaBrowserHelper: MediaBrowserHelper
-    private lateinit var mediaBrowser: MediaBrowserCompat
-
     init {
         System.loadLibrary("c++_shared")
         System.loadLibrary("appleMusicSDK")
     }
 
+    /**
+     * This is the TCP service that is running on boot of the application to get messages via the
+     * network socket of our home network. If the TCPClientHandler which lives inside
+     * TcpServerService reads the word "Test" from the data stream of the socket connection,
+     * we start are authentication flow to save the user token for us to be able to play music
+     *
+     * This service will later be hooked into when we get a playback error when the user token has
+     * expired, to tell the authentication manager to refresh
+     */
+
+    // network socket. Currently, when the TcpClientHandler receives a message called "Test"
     inner class Connection : ServiceConnection {
 
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
@@ -46,13 +53,13 @@ class MainActivity : AppCompatActivity() {
             mService.trigger.observe(this@MainActivity) {
                 println("Trigger is $it")
                 if (it) {
-                    viewModel
+
                     // Use createIntentBuilder api to create the Intentbuilder which the 3rd party app can use to customize a few things
                     val params: HashMap<String, String> = HashMap<String, String>()
                     params["ct"] = "mytestCampaignToken"
                     params["at"] = "mytestAffiliateToken"
                     val intent =
-                        authenticationManager.createIntentBuilder("eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjhQRjgyNlVCVk4ifQ.eyJpc3MiOiI0TjNTVFY3NTVXIiwiaWF0IjoxNjk0NjIxODI4LCJleHAiOjE2OTQ3MDgyMjh9.wVreV7GBZfgmWphx6FRAWOIRnjXSeJ1-OPnCXUti0eog_4m5UocTj9x_dInFAVvfEkSAKDhEU4UoxugDi29-OQ")
+                        authenticationManager.createIntentBuilder(BuildConfig.developerToken)
                             .setHideStartScreen(false)
                             .setStartScreenMessage("Test this")
                             .setContextId("1100742453")
@@ -74,11 +81,10 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
+        // Create TCP service to listen to messages sent over the socket
         Intent(applicationContext, TcpServerService::class.java).also { intent ->
             bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
-
-
     }
 
 
@@ -90,11 +96,6 @@ class MainActivity : AppCompatActivity() {
 
     private val authenticationManager: AuthenticationManager =
         AuthenticationFactory.createAuthenticationManager(this)
-
-    private fun startTCPServer() {
-        val intent = Intent(applicationContext, TcpServerService::class.java)
-        startService(intent)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -7,6 +7,9 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 
+/**
+ * Responsible for structuring the queries for searching Apple Music's API
+ */
 interface SearchService {
 
     @GET("catalog/us/search/suggestions")

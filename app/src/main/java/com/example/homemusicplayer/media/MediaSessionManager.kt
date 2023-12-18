@@ -27,6 +27,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/**
+ * Class that is created by the PlaybackSessionService that holds the actual MediaPlayerController
+ * used to play content. We implement MediaSessionCompat.Callback() to receive playback info such as
+ * play song/album/playlist etc. Refer to SearchViewModel playMedia() for example. The playback info
+ * is relayed downstream to here.
+ */
 internal class MediaSessionManager(
     private val playerController: MediaPlayerController,
     mediaSession: MediaSessionCompat

@@ -34,6 +34,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+// The search bar that holds the user query and passes the text to the updateSearchQuery that lives
+// in the SearchViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(

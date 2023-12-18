@@ -28,12 +28,6 @@ class SearchViewModel @Inject constructor(
 ) : BaseViewModel() {
 
 
-    var _terms = MutableStateFlow<ApiResponse<SearchSuggestionResponse>>(ApiResponse.Loading)
-    val terms = _terms.asStateFlow()
-
-    var _catalog = MutableStateFlow<ApiResponse<SearchResponse>>(ApiResponse.Loading)
-    val catalog = _catalog.asStateFlow()
-
     var _searchTerm = MutableStateFlow("")
     val searchTerm = _searchTerm.asStateFlow()
 

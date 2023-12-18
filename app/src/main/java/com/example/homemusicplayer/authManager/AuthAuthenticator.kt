@@ -21,13 +21,20 @@ import java.time.Instant
 import java.util.Base64
 import javax.inject.Inject
 
+/**
+ * Auth authenticator used for the OKHTTP to refresh the developer token
+ */
 class AuthAuthenticator @Inject constructor(
     private val tokenManager: TokenManager,
 ) : Authenticator {
 
+    /**
+     * Implementation of the required Authenticator function to build a valid request with valid
+     * credentials into the header for the HTTP request to be sent
+     */
     override fun authenticate(route: Route?, response: Response): Request {
         return runBlocking {
-            val jwtResult = getNewToken()
+            val jwtResult = getNewJWTToken()
             var newToken = ""
 
             val privateKey = getPrivateKey()
@@ -47,6 +54,10 @@ class AuthAuthenticator @Inject constructor(
         }
     }
 
+    /**
+     * Gets new provide key and generates an ECPrivateKey that is used to sign the header used for a
+     * valid HTTP request from Apple Music's API
+     */
     @Throws(IOException::class)
     fun getPrivateKey(): ECPrivateKey {
         val BC = BouncyCastleProvider()
@@ -61,7 +72,10 @@ class AuthAuthenticator @Inject constructor(
         return factory.generatePrivate(spec) as ECPrivateKey
     }
 
-    private fun getNewToken(): JWT<JWSES256Algorithm> {
+    /**
+     * Generates new JWT token based off developer credentials
+     */
+    private fun getNewJWTToken(): JWT<JWSES256Algorithm> {
 
         val teamId = BuildConfig.teamId
         val keyId = BuildConfig.keyId

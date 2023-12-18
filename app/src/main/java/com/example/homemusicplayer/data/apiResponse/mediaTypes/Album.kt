@@ -7,6 +7,10 @@ import com.example.homemusicplayer.media.MediaExtensions
 
 class Album : MediaType<AlbumAttributes>() {
 
+    /**
+     * Required function by the extending class to create a MediaMetadataCompat instance that is
+     * needed to pass to Apple's Media Player API to actually play the context
+     */
     override fun toMediaMetadataCompat(): MediaMetadataCompat {
         val metadataBuilder = MediaMetadataCompat.Builder()
         metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, id)
@@ -21,7 +25,6 @@ class Album : MediaType<AlbumAttributes>() {
             MediaExtensions.CONTAINER_TYPE,
             MediaContainerType.ALBUM.toLong()
         )
-//        metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, fullArtworkUrl)
         return metadataBuilder.build()
     }
 }

@@ -28,6 +28,12 @@ import com.example.homemusicplayer.data.apiResponse.mediaTypes.Playlist
 import com.example.homemusicplayer.data.apiResponse.mediaTypes.Song
 import com.example.homemusicplayer.data.apiResponse.mediaTypes.attributes.ArtistAttributes
 
+/**
+ * Rendered MediaItem. This can be an Album, Artist, Song
+ *
+ * @param resource, the media we want to render. This can be an Album, Artist, Song
+ * @param playMedia callback that is triggered on click to play that media item
+ */
 @Composable
 fun MediaTypeItem(
     resource: MediaType<*>,
@@ -35,20 +41,14 @@ fun MediaTypeItem(
 ) {
 
     val color = androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
-//    val activity = LocalContext.current as Activity
-//    val mediaController = MediaControllerCompat(this, mediaBrowser.getSessionToken())
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(80.dp)
             .clickable {
+                // Tell the callback that lives in the
                 playMedia(resource)
-//                when(resource) {
-//                    is Song -> playMedia(resource)
-//                    is Artist -> playMedia(resource)
-//                    is Album -> playMedia(resource)
-//                }
             }
             .drawBehind {
                 val strokeWidth = density * .7f
@@ -67,7 +67,7 @@ fun MediaTypeItem(
         AsyncImage(
             modifier = Modifier
                 .size(60.dp)
-                .conditional(resource),
+                .createMediaItemShape(resource),
             model = resource.attributes.artwork?.url
                 ?.replace("{w}", "100", false)
                 ?.replace("{h}", "100", false),
@@ -85,24 +85,7 @@ fun MediaTypeItem(
     }
 }
 
-//private fun playItem(mediaItem: MediaBrowserCompat.MediaItem) {
-//    val mediaController = MediaControllerCompat.getMediaController(getActivity())
-//    Log.e("Playing", "Playing Item")
-//    if (mediaController != null) {
-//        val mediaUri = mediaItem.description.mediaUri
-//        if (mediaUri != null) {
-//            Log.e("Playing", "mediaURI not null $mediaUri")
-//            mediaController.transportControls.playFromUri(mediaUri, mediaItem.description.extras)
-//        } else {
-//            Log.e("Playing", "mediaURI is null " + mediaItem.mediaId)
-//            mediaController.transportControls.playFromMediaId(
-//                mediaItem.mediaId,
-//                mediaItem.description.extras
-//            )
-//        }
-//    }
-//}
-
+// The description in the MediaItem
 @Composable
 fun MediaItemDescription(desc: String) {
     Text(
@@ -111,7 +94,8 @@ fun MediaItemDescription(desc: String) {
     )
 }
 
-fun Modifier.conditional(
+// Creates the proper shape based off media item
+fun Modifier.createMediaItemShape(
     mediaType: MediaType<*>,
 ): Modifier {
     return when (mediaType) {
@@ -120,6 +104,7 @@ fun Modifier.conditional(
     }
 }
 
+// Test view
 @Preview
 @Composable
 fun MediaItem() {

@@ -26,21 +26,13 @@
             android:exported="false" />
 
         <service
-            android:name=".media.MediaPlaybackService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.media.browse.MediaBrowserService" />
-            </intent-filter>
-        </service>
-
-        <service
             android:name=".media.PlaybackSessionService"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
-        
+
 
         <activity
             android:name=".MainActivity"
@@ -53,6 +45,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver android:name="androidx.media.session.MediaButtonReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
     </application>
 
     <queries>

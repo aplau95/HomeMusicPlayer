@@ -1,11 +1,13 @@
 package com.example.homemusicplayer.media
 
-import android.app.PendingIntent
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.media.MediaBrowserServiceCompat
+import androidx.media.session.MediaButtonReceiver
 import com.apple.android.music.playback.controller.MediaPlayerController
 import com.apple.android.music.playback.controller.MediaPlayerControllerFactory
 import com.apple.android.music.playback.model.MediaPlayerException
@@ -13,26 +15,44 @@ import com.apple.android.music.playback.model.PlayerQueueItem
 import com.example.homemusicplayer.api.AppleMusicTokenProvider
 import com.example.homemusicplayer.data.SearchRepository
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 
+/**
+ * This takes the MediaBrowser and
+ */
 @AndroidEntryPoint
 class PlaybackSessionService : MediaBrowserServiceCompat() {
 
     @Inject
     lateinit var searchRepository: SearchRepository
 
+    // Part of Apple Music SDK
     lateinit var playerController: MediaPlayerController
 
     private lateinit var mediaSession: MediaSessionCompat
 
     lateinit var mediaProvider: MediaProvider
 
+    private lateinit var mediaNotificationManager: MediaNotificationManager
+
+    val backgroundThread = CoroutineScope(Dispatchers.IO)
+    val mainThread = CoroutineScope(Dispatchers.Main)
+
     companion object {
 
+        private val CANONICAL_NAME = PlaybackSessionService::class.java.canonicalName
+        val ACTION_CURRENT_ITEM_CHANGED = "$CANONICAL_NAME.action_current_item_changed"
         private const val TAG = "MediaPlayerService"
 
         var currentDuration: Long = 0L
             private set
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        MediaButtonReceiver.handleIntent(mediaSession, intent)
+        return super.onStartCommand(intent, flags, startId)
     }
 
     init {
@@ -49,23 +69,20 @@ class PlaybackSessionService : MediaBrowserServiceCompat() {
         }
     }
 
+    private fun initMediaNotificationManager() {
+        mediaNotificationManager = MediaNotificationManager(this)
+    }
+
     override fun onCreate() {
         super.onCreate()
 
+        initMediaNotificationManager()
+
+        // Create the controller Apple Music playback. We need to use this since we need to provide the
+        // AppleMusicTokenProvider to verify that this user has the rights to play music
         playerController =
             MediaPlayerControllerFactory.createLocalController(this, AppleMusicTokenProvider(this))
         playerController.addListener(MediaPlayerControllerListener())
-
-        val sessionActivityIntent = packageManager
-            ?.getLaunchIntentForPackage(packageName)
-            ?.let { sessionIntent ->
-                PendingIntent.getActivity(
-                    this,
-                    0,
-                    sessionIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
-            }
 
         mediaSession = MediaSessionCompat(this, TAG).apply {
             setFlags(
@@ -83,6 +100,20 @@ class PlaybackSessionService : MediaBrowserServiceCompat() {
 
         sessionToken = mediaSession.sessionToken
         mediaProvider = MediaProvider(this, searchRepository)
+    }
+
+    // Update the notification manager to let us know a new item is being played
+    private fun updateNotificationForItemChanged(currentItem: PlayerQueueItem?) {
+
+        currentItem?.let {
+            val notification = mediaNotificationManager.getNotification(
+                it.item,
+                mediaSession.sessionToken,
+                PlaybackStateCompat.STATE_PLAYING, playerController.currentPosition
+            )
+            mediaNotificationManager.notificationManager
+                .notify(MediaNotificationManager.NOTIFICATION_ID, notification)
+        }
     }
 
     override fun onGetRoot(
@@ -109,6 +140,9 @@ class PlaybackSessionService : MediaBrowserServiceCompat() {
     }
 
 
+    /**
+     * Notifies of any state changes to the media currently playing
+     */
     inner class MediaPlayerControllerListener : MediaPlayerController.Listener {
 
         override fun onPlayerStateRestored(p0: MediaPlayerController) {
@@ -130,9 +164,12 @@ class PlaybackSessionService : MediaBrowserServiceCompat() {
         override fun onCurrentItemChanged(
             p0: MediaPlayerController,
             p1: PlayerQueueItem?,
-            p2: PlayerQueueItem?
+            currentItem: PlayerQueueItem?
         ) {
+            Log.e(TAG, "onCurrentItemChanged")
+            updateNotificationForItemChanged(currentItem)
         }
+
 
         override fun onItemEnded(p0: MediaPlayerController, p1: PlayerQueueItem, p2: Long) {
         }

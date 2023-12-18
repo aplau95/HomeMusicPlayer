@@ -22,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -44,6 +43,9 @@ import com.example.homemusicplayer.viewModel.SearchViewModel
 import kotlinx.coroutines.launch
 
 
+/**
+ * Defines the resources for the tabs we have available to navigate to
+ */
 enum class HomePage(
     @StringRes val titleResId: Int,
     val icon: ImageVector
@@ -55,7 +57,10 @@ enum class HomePage(
 
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+/**
+ * Home view that holds the the Tab Navigation and and Page we are on
+ */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Home(
     modifier: Modifier = Modifier,
@@ -69,10 +74,13 @@ fun Home(
     }
 
     Scaffold(bottomBar = { TabBar(pagerState = pagerState) }) {
-        HomeNavBar(pagerState = pagerState, modifier.padding(top = it.calculateTopPadding()))
+        HomeNavPage(pagerState = pagerState, modifier.padding(top = it.calculateTopPadding()))
     }
 }
 
+/**
+ * Handles navigation of the page we want to be on
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TabBar(
@@ -105,9 +113,12 @@ private fun TabBar(
     }
 }
 
+/**
+ * Holds the current Page we are on to be rendered
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun HomeNavBar(
+private fun HomeNavPage(
     pagerState: PagerState,
     modifier: Modifier = Modifier,
     viewModel: SearchViewModel = hiltViewModel()
@@ -134,6 +145,8 @@ private fun HomeNavBar(
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.background),
                 topBar = {
+
+                    // App bar within the Page that tells us where in the app we are currently at
                     TopAppBar(
                         backgroundColor = androidx.compose.material.MaterialTheme.colors.background,
                         elevation = 0.dp,
@@ -158,6 +171,7 @@ private fun HomeNavBar(
                 }
             ) {
 
+                // Depending on the selected index of the TabBar, we render that view
                 when (index) {
                     0 -> {
                         Library(

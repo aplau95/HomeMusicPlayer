@@ -11,6 +11,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+/**
+ * Holds business logic for handling updating the tokens needed for Apple Music
+ */
 @HiltViewModel
 class TokenViewModel @Inject constructor(
     private val tokenManager: TokenManager

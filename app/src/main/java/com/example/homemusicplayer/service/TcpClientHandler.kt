@@ -1,19 +1,26 @@
 package com.example.homemusicplayer.service
 
-import android.util.Log
 import java.io.BufferedReader
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.IOException
 import java.io.InputStreamReader
 
-class TcpClientHandler(private val dataInputStream: DataInputStream, private val dataOutputStream: DataOutputStream, private val callback: () -> Unit) : Thread() {
+/**
+ * Handles the parsing of data sent through the socket to trigger the callback
+ */
+class TcpClientHandler(
+    private val dataInputStream: DataInputStream,
+    private val dataOutputStream: DataOutputStream,
+    private val callback: () -> Unit
+) : Thread() {
+
     override fun run() {
         while (true) {
             try {
-                if(dataInputStream.available() > 0){
+                if (dataInputStream.available() > 0) {
                     val reader = BufferedReader(InputStreamReader(dataInputStream))
-                    if(reader.readLine() == "Test") callback.invoke()
+                    if (reader.readLine() == "Test") callback.invoke()
                     dataOutputStream.writeUTF("Hello Client")
                     sleep(2000L)
                 }
@@ -38,6 +45,7 @@ class TcpClientHandler(private val dataInputStream: DataInputStream, private val
     }
 
     companion object {
+
         private val TAG = TcpClientHandler::class.java.simpleName
     }
 

@@ -17,6 +17,14 @@ val keyId: String = com.android.build.gradle.internal.cxx.configure.gradleLocalP
     rootDir
 ).getProperty("keyId")
 
+val developerToken: String = com.android.build.gradle.internal.cxx.configure.gradleLocalProperties(
+    rootDir
+).getProperty("developerToken")
+
+val userToken: String = com.android.build.gradle.internal.cxx.configure.gradleLocalProperties(
+    rootDir
+).getProperty("userToken")
+
 android {
     namespace = "com.example.homemusicplayer"
     compileSdk = 34
@@ -24,8 +32,8 @@ android {
 
     defaultConfig {
         applicationId = "com.example.homemusicplayer"
-        minSdk = 21
-        targetSdk = 28
+        minSdk = 23
+        targetSdk = 30
         versionCode = 1
         versionName = "1.0"
 
@@ -42,6 +50,8 @@ android {
         }
         debug {
             buildConfigField("String", "privateKey", privateKey)
+            buildConfigField("String", "developerToken", developerToken)
+            buildConfigField("String", "userToken", userToken)
             buildConfigField("String", "teamId", teamId)
             buildConfigField("String", "keyId", keyId)
         }
